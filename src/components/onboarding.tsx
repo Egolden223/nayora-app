@@ -1,1 +1,1 @@
-PLACEHOLDER
+{{include:/tmp/onboarding_fixed.tsx}}
