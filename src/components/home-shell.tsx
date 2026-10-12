@@ -66,6 +66,11 @@ export function HomeShell({
         if (!live) return;
         setCards(d);
         setMatches(m);
+      } catch {
+        if (live) {
+          setCards([]);
+          setMatches([]);
+        }
       } finally {
         if (live) setLoading(false);
       }
@@ -223,12 +228,28 @@ function NavBtn({
   );
 }
 
-export function useProfileLoader() {
-  const [me, setMe] = useState<Profile | null | undefined>(undefined);
+/**
+ * Load the signed-in profile. When `enabled` is false (signed out),
+ * returns me=null immediately without calling the server.
+ * Always catches errors so a failed request cannot freeze the UI.
+ */
+export function useProfileLoader(enabled = true) {
+  const [me, setMe] = useState<Profile | null | undefined>(
+    enabled ? undefined : null,
+  );
   const reload = useCallback(async () => {
-    const p = await getMyProfile();
-    setMe(p);
-  }, []);
+    if (!enabled) {
+      setMe(null);
+      return;
+    }
+    try {
+      const p = await getMyProfile();
+      setMe(p);
+    } catch {
+      // Unauthorized / network / DB error → treat as no profile
+      setMe(null);
+    }
+  }, [enabled]);
   useEffect(() => {
     void reload();
   }, [reload]);
