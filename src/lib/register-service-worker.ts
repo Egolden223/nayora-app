@@ -1,8 +1,10 @@
-export function registerServiceWorker() {
-  if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {
-      /* ignore */
+import { useEffect } from "react";
+
+export function useRegisterServiceWorker() {
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    void navigator.serviceWorker.register("/sw.js").catch(() => {
+      // Best-effort: failed registration just means no offline shell
     });
-  });
+  }, []);
 }
