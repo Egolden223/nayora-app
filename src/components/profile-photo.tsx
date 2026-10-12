@@ -36,7 +36,9 @@ export function ProfilePhoto({
 }: {
   name?: string | null;
   seed: string;
+  /** Real uploaded photo, when there is one — takes over the whole avatar. */
   photoUrl?: string | null;
+  /** La photo est la version floutée (le membre la dévoile au match) : on ajoute un cadenas. */
   hidden?: boolean;
   className?: string;
   textClassName?: string;

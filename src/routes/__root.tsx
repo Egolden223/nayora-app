@@ -1,0 +1,112 @@
+import {
+  createRootRoute,
+  HeadContent,
+  Outlet,
+  Scripts,
+} from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { useEffect } from "react";
+import { AuthProvider } from "@/lib/auth/provider";
+import { LangProvider } from "@/lib/lang";
+import { migrateLegacyStorage } from "@/lib/storage-migrate";
+import { useRegisterServiceWorker } from "@/lib/register-service-worker";
+import { Toaster } from "sonner";
+import appCss from "../styles.css?url";
+
+const APP_NAME = "NAYORA";
+
+const fetchSessionUser = createServerFn({ method: "GET" }).handler(async () => {
+  const { getSessionUser } = await import("@/lib/auth/verify.server");
+  const u = await getSessionUser();
+  return u ? { id: u.id, email: u.email } : null;
+});
+
+export const Route = createRootRoute({
+  beforeLoad: async () => ({ sessionUser: await fetchSessionUser() }),
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5",
+      },
+      { title: APP_NAME },
+      {
+        name: "description",
+        content:
+          "NAYORA — Connecter autrement. Rencontres sincères, amitiés, réseau professionnel, voyages et projets. Ouverte à tous les pays du monde.",
+      },
+      { property: "og:title", content: "NAYORA — Connecter autrement." },
+      {
+        property: "og:description",
+        content:
+          "Love, Friends, Pro, Travel, Projects : cinq univers pour créer des liens authentiques. Discussions sécurisées, profils vérifiés.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: "/og.jpg" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "theme-color", content: "#101C2C" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: APP_NAME },
+      { name: "format-detection", content: "telephone=no" },
+    ],
+    links: [
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap",
+      },
+    ],
+  }),
+  component: RootDocument,
+});
+
+function RootDocument() {
+  useRegisterServiceWorker();
+  useEffect(() => {
+    migrateLegacyStorage();
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (ref) localStorage.setItem("nayora:ref", ref.toUpperCase());
+  }, []);
+  return (
+    <html lang="fr" className="dark antialiased" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <AuthProvider>
+          <LangProvider>
+            <Outlet />
+            <Toaster
+              theme="dark"
+              position="top-center"
+              toastOptions={{
+                style: {
+                  background: "#172740",
+                  color: "#f5f0e7",
+                  border: "1px solid #2a3f5e",
+                },
+              }}
+            />
+          </LangProvider>
+        </AuthProvider>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
