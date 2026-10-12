@@ -11,10 +11,11 @@ export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
   const { user, isPending } = useCurrentUserState();
-  const { me, reload } = useProfileLoader();
+  const { me, reload } = useProfileLoader(!!user && !isPending);
   const [editing, setEditing] = useState(false);
 
-  if (isPending || me === undefined) {
+  // Session still resolving — show splash
+  if (isPending) {
     return (
       <main className="grid min-h-dvh place-items-center">
         <div className="flex flex-col items-center gap-4">
@@ -27,7 +28,22 @@ function Home() {
     );
   }
 
+  // Not signed in — go to login (do NOT wait on profile)
   if (!user) return <RedirectToSignIn />;
+
+  // Signed in but profile still loading
+  if (me === undefined) {
+    return (
+      <main className="grid min-h-dvh place-items-center">
+        <div className="flex flex-col items-center gap-4">
+          <Wordmark markClassName="text-4xl" />
+          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-secondary">
+            <div className="h-full w-1/2 animate-pulse bg-primary" />
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   if (!me) {
     return (
