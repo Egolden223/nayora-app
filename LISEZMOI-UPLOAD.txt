@@ -1,0 +1,32 @@
+NAYORA — Archive des corrections UI + filtres serveur
+======================================================
+
+Contenu (chemins relatifs = chemins GitHub) :
+
+  public/sw.js                          Service worker v4 (purge cache PWA)
+  src/components/wordmark.tsx           Logo : icône N + AYORA (plus de NNAYORA)
+  src/components/language-switch.tsx    Langue compacte : FR / EN / AR / ES / PT
+  src/components/universe.tsx           Univers centré si ≤ 3 chips
+  src/components/filter-sheet.tsx       Filtres Love : âge min/max, taille, religion, ville
+  src/components/discover.tsx           emptyFilters + FilterSheet
+  src/lib/i18n_extra.ts                 Clés ageMin, ageMax, heightMin, optional, etc.
+  src/lib/dating.ts                     Re-export propre
+  src/lib/dating_final.ts               listDiscover avec filtres serveur Love
+
+Comment uploader sur GitHub
+---------------------------
+1. Ouvre https://github.com/Egolden223/nayora-app
+2. Pour chaque fichier, va dans le dossier correspondant (ex. src/lib/)
+3. Clique "Add file" → "Upload files" (ou édite le fichier existant)
+4. Dépose le fichier du même chemin (remplace l’existant)
+5. Message de commit : "fix: restore dating_final + UI improvements (logo, filters, SW v4)"
+6. Commit sur la branche main
+
+Ordre recommandé (priorité) :
+  1. src/lib/dating_final.ts   ← critique (fichier actuellement cassé)
+  2. src/lib/dating.ts
+  3. src/components/wordmark.tsx
+  4. public/sw.js
+  5. le reste
+
+Après le push, Vercel redéploiera automatiquement (ou redéploie manuellement).

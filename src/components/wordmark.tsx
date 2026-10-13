@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
  * NAYORA wordmark.
  * Le pictogramme (nayora-mark.png) EST la lettre N du logo.
  * En mode compact (en-tête) : pictogramme + « AYORA » → lit NAYORA sans double N.
- * En mode plein : pictogramme au-dessus + « AYORA », slogan optionnel.
+ * En mode plein : pictogramme + « AYORA », slogan optionnel.
  */
 export function Wordmark({
   className,

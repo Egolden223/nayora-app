@@ -30,8 +30,9 @@ import { Button } from "@/components/ui/button";
 import { FieldSelect } from "@/components/field-select";
 import { ProfilePhoto } from "@/components/profile-photo";
 import { UniverseBar } from "@/components/universe";
-import { UniverseFacts } from "@/components/universe-form";
 import { FilterSheet } from "@/components/filter-sheet";
+import { UniverseFacts } from "@/components/universe-form";
+import { UNIVERSE_FACETS } from "@/lib/universe-match";
 
 const emptyFiltersFor = (intention: string): DiscoverFilters => ({
   ageBand: "all",
@@ -115,6 +116,7 @@ export function Discover({
       }
       setNotice(null);
       if (res.status === "matched") {
+        // Mémoriser le commentaire pour un éventuel premier message contextuel
         if (likeNote.trim() && typeof sessionStorage !== "undefined") {
           sessionStorage.setItem(
             `nayora:likeNote:${res.matchId}`,
@@ -136,13 +138,17 @@ export function Discover({
 
   const askWhy = async () => {
     if (!current) return;
-    const res = await explainMatch({ data: { userId: current.userId, lang } });
+    const res = await explainMatch({
+      data: { userId: current.userId, lang },
+    });
     if (res.ok) setInsight(res.text);
   };
 
   const askIce = async () => {
     if (!current) return;
-    const res = await suggestIcebreaker({ data: { userId: current.userId, lang } });
+    const res = await suggestIcebreaker({
+      data: { userId: current.userId, lang },
+    });
     if (res.ok) setIce(res.text);
   };
 
@@ -153,16 +159,7 @@ export function Discover({
           className="mb-3 w-full"
           allowed={myUniverses}
           value={filters.intention}
-          onChange={(v) =>
-            onFilters({
-              ...filters,
-              intention: v,
-              facet: "all",
-              gender: "all",
-              ageBand: "all",
-              familyStatus: "all",
-            })
-          }
+          onChange={(v) => onFilters({ ...filters, intention: v, facet: "all", gender: "all", ageBand: "all", familyStatus: "all" })}
         />
         <div className="mb-3 flex w-full justify-end">
           <IconBtn
@@ -214,16 +211,7 @@ export function Discover({
         className="mb-3"
         allowed={myUniverses}
         value={filters.intention}
-        onChange={(v) =>
-          onFilters({
-            ...filters,
-            intention: v,
-            facet: "all",
-            gender: "all",
-            ageBand: "all",
-            familyStatus: "all",
-          })
-        }
+        onChange={(v) => onFilters({ ...filters, intention: v, facet: "all", gender: "all", ageBand: "all", familyStatus: "all" })}
       />
       <FindMeBox filters={filters} onFilters={onFilters} />
       {notice && <p className="mb-3 rounded-xl bg-secondary px-3 py-2 text-sm text-primary">{notice}</p>}
@@ -304,22 +292,79 @@ export function Discover({
                 {current.score}%
               </button>
             </div>
-            <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-cream/90">{current.bio}</p>
+            <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-cream/90">
+              {current.bio}
+            </p>
             <UniverseFacts universe={current.matchUniverse} data={current.universeData} />
+            {current.matchUniverse === "mariage" && current.universeData.lookingForText && (
+              <p className="mt-2 text-sm italic text-muted-foreground">
+                {t("lookingForShort")} : {current.universeData.lookingForText}
+              </p>
+            )}
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {current.meetRating !== null && (
+                <Badge tone="ok">
+                  ★ {current.meetRating.toFixed(1)} · {current.meetCount} {t("repMeetings")}
+                </Badge>
+              )}
+              {current.tripRating !== null && (
+                <Badge tone="ok">
+                  ★ {current.tripRating.toFixed(1)} · {current.tripReviewCount} {t("repTrips")}
+                </Badge>
+              )}
+              {current.matchUniverse === "voyage" &&
+                current.universeData.travelGoal === "guide" &&
+                current.verificationStatus === "verifie" && (
+                  <Badge tone="ok">
+                    <ShieldCheck className="mr-1 size-3" />
+                    {t("guideVerified")}
+                  </Badge>
+                )}
+            </div>
+            {current.matchUniverse === "projets" &&
+              current.impactStories.slice(0, 2).map((s, i) => (
+                <p key={i} className="mt-2 text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">✦ {s.title}</span> — {s.summary}
+                </p>
+              ))}
+            {current.reasons.length > 0 && (
+              <p className="mt-2 text-xs text-primary">
+                ✦ {current.reasons.map((r) => t(r)).join(" · ")}
+              </p>
+            )}
             <div className="mt-3 flex flex-wrap gap-1.5">
               {current.universes.map((u, i) => (
                 <Badge key={u} tone={i === 0 ? "primary" : undefined}>
                   {t(u)}
                 </Badge>
               ))}
+              {current.matchUniverse === "mariage" && <Badge>{t(current.familyStatus)}</Badge>}
+              {current.proDomain && <Badge>{t(current.proDomain)}</Badge>}
+              {current.idDocumentStatus === "verifie" && (
+                <Badge tone="ok">
+                  <ShieldCheck className="mr-1 size-3" />
+                  {t("idVerified")}
+                </Badge>
+              )}
               {current.verificationStatus === "verifie" && (
                 <Badge tone="ok">
                   <ShieldCheck className="mr-1 size-3" />
                   {t("verified")}
                 </Badge>
               )}
+              {current.responsiveFast && <Badge tone="ok">{t("respondsFast")}</Badge>}
             </div>
           </div>
+          {current.alreadyLiked && (
+            <div className="absolute right-4 top-4 rotate-12 rounded-lg border border-primary px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
+              {t("youLike")}
+            </div>
+          )}
+          {current.isDemo && (
+            <div className="absolute left-4 top-4 rounded-full bg-plum/50 px-2.5 py-1 text-[10px] uppercase tracking-wider text-cream/80">
+              {t("demoHint").split("—")[0]}
+            </div>
+          )}
         </div>
       </SwipeCard>
 
@@ -353,10 +398,23 @@ export function Discover({
         />
       </div>
       <div className="mt-4 flex items-center justify-center gap-5">
-        <Button variant="outline" size="icon" aria-label={t("pass")} className="h-16 w-16" onClick={pass} disabled={busy}>
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label={t("pass")}
+          className="h-16 w-16"
+          onClick={pass}
+          disabled={busy}
+        >
           <X className="size-7 text-muted-foreground" />
         </Button>
-        <Button size="icon" aria-label={t("like")} className="h-16 w-16" onClick={like} disabled={busy}>
+        <Button
+          size="icon"
+          aria-label={t("like")}
+          className="h-16 w-16"
+          onClick={like}
+          disabled={busy}
+        >
           <Heart className="size-7" />
         </Button>
       </div>
@@ -378,13 +436,31 @@ export function Discover({
       )}
 
       {spark && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-plum/70 px-6" onClick={() => setSpark(null)}>
-          <div className="app-shell rounded-[28px] border border-border bg-card p-8 text-center" onClick={(e) => e.stopPropagation()}>
-            <ProfilePhoto name={spark.firstName} seed={spark.userId} photoUrl={spark.photoUrl} className="mx-auto size-20 rounded-full" textClassName="text-2xl" />
-            <h3 className="mt-5 font-display text-3xl font-medium">{t("matchTitle")}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{t("matchLead")}</p>
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-plum/70 px-6"
+          onClick={() => setSpark(null)}
+        >
+          <div
+            className="app-shell rounded-[28px] border border-border bg-card p-8 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ProfilePhoto
+              name={spark.firstName}
+              seed={spark.userId}
+              photoUrl={spark.photoUrl}
+              className="mx-auto size-20 rounded-full"
+              textClassName="text-2xl"
+            />
+            <h3 className="mt-5 font-display text-3xl font-medium">
+              {t("matchTitle")}
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t("matchLead")}
+            </p>
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button variant="outline" onClick={() => setSpark(null)}>{t("keepBrowsing")}</Button>
+              <Button variant="outline" onClick={() => setSpark(null)}>
+                {t("keepBrowsing")}
+              </Button>
               <Button onClick={() => setSpark(null)}>{t("write")}</Button>
             </div>
           </div>
@@ -437,9 +513,47 @@ function SwipeCard({
   onLike: () => void;
   onPass: () => void;
 }) {
-  return <div className="relative">{children}</div>;
+  const ref = useRef<HTMLDivElement>(null);
+  const startX = useRef(0);
+  const dragging = useRef(false);
+  const [dx, setDx] = useState(0);
+
+  const onDown = (x: number) => {
+    dragging.current = true;
+    startX.current = x;
+  };
+  const onMove = (x: number) => {
+    if (!dragging.current) return;
+    setDx(x - startX.current);
+  };
+  const onUp = () => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    if (dx > 88) onLike();
+    else if (dx < -88) onPass();
+    setDx(0);
+  };
+
+  return (
+    <div
+      ref={ref}
+      className="touch-pan-y"
+      style={{
+        transform: `translateX(${dx}px) rotate(${dx / 28}deg)`,
+        transition: dragging.current ? "none" : "transform 180ms cubic-bezier(0.22,1,0.36,1)",
+      }}
+      onPointerDown={(e) => onDown(e.clientX)}
+      onPointerMove={(e) => onMove(e.clientX)}
+      onPointerUp={onUp}
+      onPointerCancel={onUp}
+    >
+      {children}
+    </div>
+  );
 }
 
+
+/** Recherche simple en langage naturel → filtres (sans IA externe). */
 function FindMeBox({
   filters,
   onFilters,
@@ -447,14 +561,29 @@ function FindMeBox({
   filters: DiscoverFilters;
   onFilters: (f: DiscoverFilters) => void;
 }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [q, setQ] = useState("");
   const apply = () => {
     const raw = q.trim().toLowerCase();
     if (!raw) return;
     const next = { ...filters };
+    // Genre
+    if (/\b(femme|women|mujer|mulher|أنثى)\b/.test(raw)) next.gender = "femme";
+    else if (/\b(homme|men|hombre|homem|ذكر)\b/.test(raw)) next.gender = "homme";
+    // Vérifiés
+    if (/vérif|verif|verified|موثق/.test(raw)) next.verifiedOnly = true;
+    // Diaspora
+    if (/diaspora|origine|origin/.test(raw)) next.diasporaOnly = true;
+    // Tranche d'âge simple
     for (const band of AGE_BANDS) {
       if (raw.includes(band)) next.ageBand = band;
+    }
+    // Pays (code ou nom approximatif via COUNTRY_CODES — match code en majuscules dans la requête)
+    const upper = q.toUpperCase();
+    for (const code of COUNTRY_CODES) {
+      if (upper.includes(code) || raw.includes(code.toLowerCase())) {
+        if (!next.countries.includes(code)) next.countries = [...next.countries, code];
+      }
     }
     onFilters(next);
   };
@@ -478,16 +607,22 @@ function FindMeBox({
 function CuratedSuggestions() {
   const { t } = useLang();
   const [items, setItems] = useState<CuratedSuggestion[] | null>(null);
+
   useEffect(() => {
     listMySuggestions()
       .then(setItems)
       .catch(() => setItems([]));
   }, []);
+
   if (!items || items.length === 0) return null;
+
   return (
     <div className="mb-3 flex flex-col gap-2">
       {items.map((s) => (
-        <div key={s.id} className="flex items-center gap-3 rounded-2xl border border-primary/40 bg-card px-3 py-2.5">
+        <div
+          key={s.id}
+          className="flex items-center gap-3 rounded-2xl border border-primary/40 bg-card px-3 py-2.5"
+        >
           <ProfilePhoto
             name={s.profile.firstName}
             seed={s.profile.userId}

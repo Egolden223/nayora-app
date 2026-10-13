@@ -254,47 +254,59 @@ export function FilterSheet({
                   <button
                     type="button"
                     onClick={() => setDraft({ ...draft, countries: [] })}
-                    className="mb-1 w-full rounded-lg px-2 py-1.5 text-left text-xs text-primary"
+                    className="mb-1 w-full rounded-lg px-2 py-1.5 text-left text-xs text-primary hover:bg-secondary"
                   >
-                    {t("clearSelection")}
+                    {t("allCountries")}
                   </button>
                 )}
-                {sortedCountryCodes(lang, COUNTRY_CODES).map((c) => {
-                  const on = draft.countries.includes(c);
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() =>
+                {sortedCountryCodes(lang, COUNTRY_CODES).map((c) => (
+                  <label
+                    key={c}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-secondary min-h-[2.5rem]"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={draft.countries.includes(c)}
+                      onChange={(e) =>
                         setDraft({
                           ...draft,
-                          countries: on
-                            ? draft.countries.filter((x) => x !== c)
-                            : [...draft.countries, c],
+                          countries: e.target.checked
+                            ? [...draft.countries, c]
+                            : draft.countries.filter((x) => x !== c),
                         })
                       }
-                      className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm ${
-                        on ? "bg-primary/10 text-primary" : ""
-                      }`}
-                    >
-                      <span className="size-4 rounded border border-border text-center text-[10px] leading-4">
-                        {on ? "✓" : ""}
-                      </span>
-                      {countryName(lang, c)}
-                    </button>
-                  );
-                })}
+                      className="accent-primary size-4"
+                    />
+                    {countryName(lang, c)}
+                  </label>
+                ))}
               </div>
             </details>
           </div>
         </div>
-        <div className="mt-5 flex gap-3">
-          <Button variant="outline" className="flex-1" onClick={onClose}>
-            {t("keepBrowsing")}
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <Button
+            variant="outline"
+            onClick={() =>
+              setDraft({
+                ageBand: "all",
+                gender: "all",
+                intention: universe,
+                countries: [],
+                familyStatus: "all",
+                facet: "all",
+                verifiedOnly: false,
+                ageMin: undefined,
+                ageMax: undefined,
+                heightMin: undefined,
+                religion: "all",
+                city: "",
+              })
+            }
+          >
+            {t("resetFilters")}
           </Button>
-          <Button className="flex-1" onClick={onApply}>
-            {t("applyFilters")}
-          </Button>
+          <Button onClick={onApply}>{t("applyFilters")}</Button>
         </div>
       </div>
     </div>
@@ -310,7 +322,7 @@ function Field({
   label: string;
   value: string;
   onChange: (v: string) => void;
-  options: string[];
+  options: readonly string[];
 }) {
   const { t } = useLang();
   return (
@@ -321,7 +333,7 @@ function Field({
       <FieldSelect value={value} onChange={onChange}>
         {options.map((o) => (
           <option key={o} value={o}>
-            {o === "all" ? t("all") : t(o)}
+            {o === "all" ? t("all") : t(o) === o ? o : t(o)}
           </option>
         ))}
       </FieldSelect>
