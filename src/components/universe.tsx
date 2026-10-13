@@ -28,7 +28,11 @@ export function UniverseBar({
     <div
       role="tablist"
       aria-label={t("intention")}
-      className={cn("-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none", className)}
+      className={cn(
+        "-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none",
+        items.length <= 3 ? "justify-center" : "justify-start",
+        className,
+      )}
     >
       {items.map((key) => {
         const Icon = UNIVERSE_ICONS[key];
@@ -41,10 +45,10 @@ export function UniverseBar({
             aria-selected={active}
             onClick={() => onChange(key)}
             className={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors min-h-[2.5rem]",
+              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors min-h-[2.5rem]",
               active
                 ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card text-muted-foreground hover:border-primary/40",
+                : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
             )}
           >
             {Icon && <Icon className="size-3.5" strokeWidth={1.8} />}

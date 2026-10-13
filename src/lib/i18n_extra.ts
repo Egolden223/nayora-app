@@ -1,4 +1,4 @@
-/** Clés i18n additionnelles (médias chat, appels) — fusionnées dans useLang. */
+/** Clés i18n additionnelles (médias chat, appels, filtres) — fusionnées dans useLang. */
 import type { Lang } from "@/lib/i18n";
 
 const EXTRA: Record<Lang, Record<string, string>> = {
@@ -13,6 +13,10 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     cancel: "Annuler",
     mmTitle: "Accompagnement personnalisé",
     mmLead: "Un accompagnement adapté à ton profil et à tes univers.",
+    ageMin: "Âge minimum",
+    ageMax: "Âge maximum",
+    heightMin: "Taille minimum (cm)",
+    optional: "facultatif",
   },
   en: {
     sendPhoto: "Send a photo",
@@ -25,6 +29,10 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     cancel: "Cancel",
     mmTitle: "Personalized support",
     mmLead: "Support tailored to your profile and universes.",
+    ageMin: "Minimum age",
+    ageMax: "Maximum age",
+    heightMin: "Minimum height (cm)",
+    optional: "optional",
   },
   ar: {
     sendPhoto: "إرسال صورة",
@@ -37,6 +45,10 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     cancel: "إلغاء",
     mmTitle: "مرافقة مخصصة",
     mmLead: "مرافقة مكيّفة مع ملفك وعوالمك.",
+    ageMin: "الحد الأدنى للعمر",
+    ageMax: "الحد الأقصى للعمر",
+    heightMin: "الحد الأدنى للطول (سم)",
+    optional: "اختياري",
   },
   es: {
     sendPhoto: "Enviar una foto",
@@ -49,6 +61,10 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     cancel: "Cancelar",
     mmTitle: "Acompañamiento personalizado",
     mmLead: "Un acompañamiento adaptado a tu perfil y universos.",
+    ageMin: "Edad mínima",
+    ageMax: "Edad máxima",
+    heightMin: "Estatura mínima (cm)",
+    optional: "opcional",
   },
   pt: {
     sendPhoto: "Enviar uma foto",
@@ -61,6 +77,10 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     cancel: "Cancelar",
     mmTitle: "Acompanhamento personalizado",
     mmLead: "Acompanhamento adaptado ao teu perfil e universos.",
+    ageMin: "Idade mínima",
+    ageMax: "Idade máxima",
+    heightMin: "Altura mínima (cm)",
+    optional: "opcional",
   },
 };
 
