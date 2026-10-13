@@ -61,7 +61,7 @@ export function MePanel({
   };
 
   return (
-    <div className="mx-auto w-full max-w-lg px-5 pb-8 pt-4">
+    <div className="page-panel">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-3xl font-medium">{t("navProfile")}</h1>
         <div className="flex items-center gap-2">
