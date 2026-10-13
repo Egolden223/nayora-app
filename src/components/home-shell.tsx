@@ -16,14 +16,17 @@ import { cn } from "@/lib/utils";
 
 type Tab = "discover" | "matches" | "events" | "profile" | "premium";
 
-const EMPTY: DiscoverFilters = {
-  ageBand: "all",
-  gender: "all",
-  intention: "all",
-  countries: [],
-  familyStatus: "all",
-  facet: "all",
-};
+function defaultFilters(me: Profile): DiscoverFilters {
+  const primary = me.universes[0] ?? me.intention ?? "mariage";
+  return {
+    ageBand: "all",
+    gender: "all",
+    intention: primary,
+    countries: [],
+    familyStatus: "all",
+    facet: "all",
+  };
+}
 
 export function HomeShell({
   me,
@@ -38,7 +41,7 @@ export function HomeShell({
 }) {
   const { t } = useLang();
   const [tab, setTab] = useState<Tab>("discover");
-  const [filters, setFilters] = useState<DiscoverFilters>(EMPTY);
+  const [filters, setFilters] = useState<DiscoverFilters>(() => defaultFilters(me));
   const [cards, setCards] = useState<DiscoverCard[]>([]);
   const [matches, setMatches] = useState<MatchRow[]>([]);
   const [selectedMatch, setSelectedMatch] = useState<number | null>(null);
@@ -54,6 +57,14 @@ export function HomeShell({
     setMatches(list);
   }, []);
 
+  // Si l'univers actif n'est plus sur le profil, revenir au principal.
+  useEffect(() => {
+    const primary = me.universes[0] ?? me.intention ?? "mariage";
+    if (!me.universes.includes(filters.intention)) {
+      setFilters((f) => ({ ...f, intention: primary, facet: "all" }));
+    }
+  }, [me.universes, me.intention]);
+
   useEffect(() => {
     let live = true;
     (async () => {
@@ -66,11 +77,6 @@ export function HomeShell({
         if (!live) return;
         setCards(d);
         setMatches(m);
-      } catch {
-        if (live) {
-          setCards([]);
-          setMatches([]);
-        }
       } finally {
         if (live) setLoading(false);
       }
@@ -228,28 +234,12 @@ function NavBtn({
   );
 }
 
-/**
- * Load the signed-in profile. When `enabled` is false (signed out),
- * returns me=null immediately without calling the server.
- * Always catches errors so a failed request cannot freeze the UI.
- */
-export function useProfileLoader(enabled = true) {
-  const [me, setMe] = useState<Profile | null | undefined>(
-    enabled ? undefined : null,
-  );
+export function useProfileLoader() {
+  const [me, setMe] = useState<Profile | null | undefined>(undefined);
   const reload = useCallback(async () => {
-    if (!enabled) {
-      setMe(null);
-      return;
-    }
-    try {
-      const p = await getMyProfile();
-      setMe(p);
-    } catch {
-      // Unauthorized / network / DB error → treat as no profile
-      setMe(null);
-    }
-  }, [enabled]);
+    const p = await getMyProfile();
+    setMe(p);
+  }, []);
   useEffect(() => {
     void reload();
   }, [reload]);
