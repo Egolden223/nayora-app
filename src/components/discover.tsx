@@ -186,9 +186,28 @@ export function Discover({
       />
       {notice && <p className="mb-3 rounded-xl bg-secondary px-3 py-2 text-sm text-primary">{notice}</p>}
       <CuratedSuggestions />
+      {/* 5 cartes du jour : les meilleurs matchs d'abord, exploration libre ensuite */}
+      {index < 5 && cards.length > 0 && (
+        <div className="mb-3 rounded-2xl border border-primary/30 bg-primary/5 px-3 py-2.5">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-primary">
+            <Sparkles className="size-3.5" />
+            {t("dailyTopTitle")}
+          </p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {t("dailyTopLead")}
+          </p>
+        </div>
+      )}
+      {index >= 5 && (
+        <div className="mb-3 rounded-2xl border border-border bg-secondary/40 px-3 py-2">
+          <p className="text-xs text-muted-foreground">{t("exploreMoreTitle")}</p>
+        </div>
+      )}
       <div className="mb-3 flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
-          {index + 1} / {cards.length}
+          {index < 5
+            ? `${t("dailyCard")} ${Math.min(index + 1, 5)} / ${Math.min(5, cards.length)}`
+            : `${index + 1} / ${cards.length}`}
         </p>
         <IconBtn
           label={t("filters")}
