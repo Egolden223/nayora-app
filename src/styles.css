@@ -101,9 +101,6 @@
   @media (min-width: 1280px) {
     .app-shell { max-width: 42rem; }
   }
-  @media (max-height: 700px) {
-    .app-shell { /* denser on short screens */ }
-  }
   @media (pointer: coarse) {
     button, [role="button"] { touch-action: manipulation; }
   }
