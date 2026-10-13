@@ -32,7 +32,7 @@ export function EventsPanel() {
   }, [load]);
 
   return (
-    <div className="mx-auto w-full max-w-lg px-5 pb-20 pt-6">
+    <div className="page-panel">
       <CirclesSection />
       <div className="mb-5 flex items-center justify-between">
         <div>
