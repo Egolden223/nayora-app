@@ -1,2 +1,3 @@
-/** Re-export du module complet corrigé (INSERT SQL $24-$27). */
+/** Re-export du module complet + médias chat (photos). */
 export * from "./dating_final";
+export { sendImageMessage } from "./dating_media";
