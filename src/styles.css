@@ -89,15 +89,12 @@
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
   }
-  /* Tablette */
   @media (min-width: 640px) {
     .app-shell { max-width: 32rem; }
   }
-  /* PC portable */
   @media (min-width: 1024px) {
-    .app-shell { max-width: 28rem; } /* carte swipe reste confortable */
+    .app-shell { max-width: 28rem; }
   }
-  /* Grand écran : colonne centrale + respiration */
   @media (min-width: 1280px) {
     .app-shell { max-width: 30rem; }
   }
@@ -105,7 +102,6 @@
     button, [role="button"] { touch-action: manipulation; }
   }
 
-  /* Zone principale Discover / panels */
   .app-main {
     width: 100%;
     max-width: 28rem;
@@ -128,7 +124,6 @@
     .app-main { max-width: 48rem; }
   }
 
-  /* État vide Discover — pas de trou géant sur PC */
   .discover-empty {
     display: flex;
     flex-direction: column;
@@ -150,7 +145,6 @@
     }
   }
 
-  /* Carte swipe : hauteur bornée selon l’écran */
   .discover-card-frame {
     position: relative;
     width: 100%;
@@ -177,7 +171,6 @@
     }
   }
 
-  /* Nav bas centrée et limitée en largeur sur grand écran */
   .app-bottom-nav {
     max-width: 36rem;
     margin-left: auto;
@@ -196,7 +189,6 @@
   }
 }
 
-/* nayora responsive v2 */
 @layer utilities {
   .scrollbar-none {
     -ms-overflow-style: none;
@@ -222,11 +214,82 @@
   }
 }
 
-/* PC : fond un peu plus « app » centrée, moins de bande noire vide */
 @media (min-width: 1024px) {
   body {
     background:
       radial-gradient(ellipse 80% 50% at 50% -10%, rgb(201 164 92 / 0.08), transparent),
       var(--color-background);
+  }
+}
+
+/* ---- Lot 3 ergonomie globale ---- */
+@layer components {
+  .page-panel {
+    width: 100%;
+    max-width: 28rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1rem 1.25rem calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  @media (min-width: 640px) {
+    .page-panel {
+      max-width: 36rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      padding-top: 1.25rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .page-panel {
+      max-width: 42rem;
+      padding-top: 1.5rem;
+    }
+  }
+  @media (min-width: 1440px) {
+    .page-panel { max-width: 48rem; }
+  }
+
+  .page-panel-top {
+    justify-content: flex-start;
+    min-height: auto;
+  }
+  @media (min-width: 768px) {
+    .page-panel-top {
+      padding-top: 1.5rem;
+    }
+  }
+
+  .chat-composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    border-top: 1px solid var(--color-border);
+    background: color-mix(in oklab, var(--color-background) 92%, transparent);
+    padding: 0.5rem 0.75rem max(0.5rem, env(safe-area-inset-bottom));
+  }
+  .chat-bubble-img {
+    max-width: 100%;
+    max-height: 240px;
+    border-radius: 12px;
+    object-fit: cover;
+    display: block;
+  }
+  @media (min-width: 768px) {
+    .chat-bubble-img { max-height: 320px; }
+  }
+
+  .call-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-plum);
+  }
+  .call-overlay iframe {
+    flex: 1;
+    width: 100%;
+    border: 0;
+    background: #000;
   }
 }
