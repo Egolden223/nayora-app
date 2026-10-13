@@ -29,6 +29,7 @@ export function FilterSheet({
   const { t, lang } = useLang();
   const set = (key: keyof DiscoverFilters, value: string) =>
     setDraft({ ...draft, [key]: value });
+  // Filtres adaptés à l'univers actif (pas de sélecteur d'univers ici).
   const isLove = universe === "mariage";
   const isFriends = universe === "amitie";
   const isPro = universe === "professionnel";
@@ -186,12 +187,46 @@ export function FilterSheet({
             {t("verifiedOnly")}
             {draft.verifiedOnly && <span className="ml-auto text-primary">✓</span>}
           </button>
+          {(isLove || isFriends) && (
+            <button
+              type="button"
+              aria-pressed={Boolean(draft.diasporaOnly)}
+              onClick={() => setDraft({ ...draft, diasporaOnly: !draft.diasporaOnly })}
+              className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm min-h-[2.75rem] ${
+                draft.diasporaOnly ? "border-primary bg-card" : "border-border"
+              }`}
+            >
+              {t("diasporaOnly")}
+              {draft.diasporaOnly && <span className="ml-auto text-primary">✓</span>}
+            </button>
+          )}
+          {isTravel && (
+            <div className="space-y-1.5">
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {t("lbl_passportCountry")}
+              </p>
+              <FieldSelect
+                value={draft.passportCountry ?? "all"}
+                onChange={(v) => setDraft({ ...draft, passportCountry: v === "all" ? undefined : v })}
+              >
+                <option value="all">{t("all")}</option>
+                {sortedCountryCodes(lang, COUNTRY_CODES).map((c) => (
+                  <option key={c} value={c}>
+                    {countryName(lang, c)}
+                  </option>
+                ))}
+              </FieldSelect>
+            </div>
+          )}
           {facet && (
             <div className="space-y-1.5">
               <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 {t(facet.label)}
               </p>
-              <FieldSelect value={draft.facet ?? "all"} onChange={(v) => set("facet", v)}>
+              <FieldSelect
+                value={draft.facet ?? "all"}
+                onChange={(v) => set("facet", v)}
+              >
                 <option value="all">{t("all")}</option>
                 {facet.options.map((o) => (
                   <option key={o} value={o}>
@@ -203,10 +238,10 @@ export function FilterSheet({
           )}
           <div className="space-y-1.5">
             <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              {t("country")}
+              {t("countries")}
             </p>
-            <details className="group rounded-xl border border-border">
-              <summary className="flex cursor-pointer items-center justify-between px-3.5 py-2.5 text-sm min-h-[2.75rem]">
+            <details className="group rounded-2xl border border-border bg-secondary/40">
+              <summary className="flex cursor-pointer list-none items-center justify-between px-3.5 py-2.5 text-sm min-h-[2.75rem]">
                 <span>
                   {draft.countries.length === 0
                     ? t("allCountries")
@@ -219,59 +254,47 @@ export function FilterSheet({
                   <button
                     type="button"
                     onClick={() => setDraft({ ...draft, countries: [] })}
-                    className="mb-1 w-full rounded-lg px-2 py-1.5 text-left text-xs text-primary hover:bg-secondary"
+                    className="mb-1 w-full rounded-lg px-2 py-1.5 text-left text-xs text-primary"
                   >
-                    {t("allCountries")}
+                    {t("clearSelection")}
                   </button>
                 )}
-                {sortedCountryCodes(lang, COUNTRY_CODES).map((c) => (
-                  <label
-                    key={c}
-                    className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-secondary min-h-[2.5rem]"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={draft.countries.includes(c)}
-                      onChange={(e) =>
+                {sortedCountryCodes(lang, COUNTRY_CODES).map((c) => {
+                  const on = draft.countries.includes(c);
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() =>
                         setDraft({
                           ...draft,
-                          countries: e.target.checked
-                            ? [...draft.countries, c]
-                            : draft.countries.filter((x) => x !== c),
+                          countries: on
+                            ? draft.countries.filter((x) => x !== c)
+                            : [...draft.countries, c],
                         })
                       }
-                      className="accent-primary size-4"
-                    />
-                    {countryName(lang, c)}
-                  </label>
-                ))}
+                      className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm ${
+                        on ? "bg-primary/10 text-primary" : ""
+                      }`}
+                    >
+                      <span className="size-4 rounded border border-border text-center text-[10px] leading-4">
+                        {on ? "✓" : ""}
+                      </span>
+                      {countryName(lang, c)}
+                    </button>
+                  );
+                })}
               </div>
             </details>
           </div>
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            onClick={() =>
-              setDraft({
-                ageBand: "all",
-                gender: "all",
-                intention: universe,
-                countries: [],
-                familyStatus: "all",
-                facet: "all",
-                verifiedOnly: false,
-                ageMin: undefined,
-                ageMax: undefined,
-                heightMin: undefined,
-                religion: "all",
-                city: "",
-              })
-            }
-          >
-            {t("resetFilters")}
+        <div className="mt-5 flex gap-3">
+          <Button variant="outline" className="flex-1" onClick={onClose}>
+            {t("keepBrowsing")}
           </Button>
-          <Button onClick={onApply}>{t("applyFilters")}</Button>
+          <Button className="flex-1" onClick={onApply}>
+            {t("applyFilters")}
+          </Button>
         </div>
       </div>
     </div>
@@ -287,7 +310,7 @@ function Field({
   label: string;
   value: string;
   onChange: (v: string) => void;
-  options: readonly string[];
+  options: string[];
 }) {
   const { t } = useLang();
   return (
@@ -298,7 +321,7 @@ function Field({
       <FieldSelect value={value} onChange={onChange}>
         {options.map((o) => (
           <option key={o} value={o}>
-            {o === "all" ? t("all") : t(o) === o ? o : t(o)}
+            {o === "all" ? t("all") : t(o)}
           </option>
         ))}
       </FieldSelect>
