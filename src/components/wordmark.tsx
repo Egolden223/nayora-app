@@ -1,6 +1,12 @@
 import { useLang } from "@/lib/lang";
 import { cn } from "@/lib/utils";
 
+/**
+ * NAYORA wordmark.
+ * Le pictogramme (nayora-mark.png) EST la lettre N du logo.
+ * En mode compact (en-tête) : pictogramme + « AYORA » → lit NAYORA sans double N.
+ * En mode plein : pictogramme au-dessus + « AYORA », slogan optionnel.
+ */
 export function Wordmark({
   className,
   markClassName,
@@ -15,15 +21,23 @@ export function Wordmark({
   const { t } = useLang();
   if (compact) {
     return (
-      <span className={cn("inline-flex items-center gap-2", className)}>
-        <img src="/nayora-mark.png" alt="" className="h-8 w-auto" />
+      <span
+        className={cn("inline-flex items-center gap-1.5", className)}
+        aria-label="NAYORA"
+      >
+        <img
+          src="/nayora-mark.png"
+          alt=""
+          className="h-8 w-auto shrink-0"
+          aria-hidden
+        />
         <span
           className={cn(
             "font-display text-xl font-medium uppercase tracking-[0.28em] text-foreground",
             markClassName,
           )}
         >
-          Nayora
+          Ayora
         </span>
       </span>
     );
@@ -33,14 +47,21 @@ export function Wordmark({
       className={cn("inline-flex flex-col items-center gap-3", className)}
       aria-label="NAYORA"
     >
-      <img src="/nayora-mark.png" alt="" className="h-16 w-auto" />
-      <span
-        className={cn(
-          "font-display text-4xl font-medium uppercase tracking-[0.3em] text-foreground",
-          markClassName,
-        )}
-      >
-        Nayora
+      <span className="inline-flex items-center gap-2">
+        <img
+          src="/nayora-mark.png"
+          alt=""
+          className="h-12 w-auto shrink-0 sm:h-14"
+          aria-hidden
+        />
+        <span
+          className={cn(
+            "font-display text-4xl font-medium uppercase tracking-[0.28em] text-foreground",
+            markClassName,
+          )}
+        >
+          Ayora
+        </span>
       </span>
       {tagline && (
         <span className="flex items-center gap-3 text-xs tracking-[0.12em] text-primary">
