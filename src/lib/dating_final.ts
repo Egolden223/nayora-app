@@ -701,7 +701,7 @@ export const passProfile = createServerFn({ method: "POST" })
 
 export const addLike = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .validator((input: { userId: string }) => input)
+  .validator((input: { userId: string; likedOn?: string; note?: string }) => input)
   .handler(async ({ context, data }) => {
     if (!data.userId || data.userId === context.userId) {
       return { status: "ignored" as const };
@@ -718,10 +718,24 @@ export const addLike = createServerFn({ method: "POST" })
     const them = await loadProfile(data.userId);
     if (!them) return { status: "ignored" as const };
 
-    await sql.query(
-      "insert into likes (liker_id, liked_id) values ($1,$2) on conflict do nothing",
-      [context.userId, data.userId],
-    );
+    const likedOn = ["profile", "photo", "bio", "reason"].includes(data.likedOn ?? "")
+      ? data.likedOn
+      : "profile";
+    const note = (data.note ?? "").trim().slice(0, 200) || null;
+
+    // Colonnes liked_on / note optionnelles (migration 0013) — fallback sans colonnes.
+    try {
+      await sql.query(
+        `insert into likes (liker_id, liked_id, liked_on, note) values ($1,$2,$3,$4)
+         on conflict do nothing`,
+        [context.userId, data.userId, likedOn, note],
+      );
+    } catch {
+      await sql.query(
+        "insert into likes (liker_id, liked_id) values ($1,$2) on conflict do nothing",
+        [context.userId, data.userId],
+      );
+    }
 
     const reciprocal = await sql.query<{ id: number }>(
       "select id from likes where liker_id = $1 and liked_id = $2 limit 1",

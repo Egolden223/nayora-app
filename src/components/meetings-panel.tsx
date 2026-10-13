@@ -209,6 +209,14 @@ export function MeetingsPanel({ matchId, me, other }: { matchId: number; me: Pro
       </button>
       {open && (
         <div className="mt-3 space-y-3 pb-2">
+          <div className="rounded-2xl border border-border bg-secondary/30 p-3">
+            <p className="text-xs font-medium text-primary">{t("dateIdeasTitle")}</p>
+            <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+              {[t("dateIdea_1"), t("dateIdea_2"), t("dateIdea_3")].map((line) => (
+                <li key={line}>· {line}</li>
+              ))}
+            </ul>
+          </div>
           {kinds.length > 0 && (
             <div className="space-y-2">
               <select
@@ -258,6 +266,35 @@ export function MeetingsPanel({ matchId, me, other }: { matchId: number; me: Pro
                       <Video className="mr-1.5 size-4" />
                       {t("meetingJoin")}
                     </a>
+                  </Button>
+                )}
+                {(m.status === "accepted" || m.joinable) && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      const when = fmt(m.startsAt);
+                      const text = t("checkinShareText")
+                        .replace("{when}", when)
+                        .replace("{name}", other.firstName);
+                      try {
+                        if (navigator.share) {
+                          await navigator.share({ title: "NAYORA", text });
+                        } else {
+                          await navigator.clipboard.writeText(text);
+                          window.alert(t("checkinCopied"));
+                        }
+                      } catch {
+                        try {
+                          await navigator.clipboard.writeText(text);
+                          window.alert(t("checkinCopied"));
+                        } catch {
+                          /* ignore */
+                        }
+                      }
+                    }}
+                  >
+                    {t("checkinCta")}
                   </Button>
                 )}
               </div>

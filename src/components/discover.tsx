@@ -67,11 +67,15 @@ export function Discover({
   const [ice, setIce] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [likedOn, setLikedOn] = useState<"profile" | "photo" | "bio" | "reason">("profile");
+  const [likeNote, setLikeNote] = useState("");
 
   useEffect(() => {
     setIndex(0);
     setInsight(null);
     setIce(null);
+    setLikedOn("profile");
+    setLikeNote("");
   }, [cards]);
 
   const current = cards[index];
@@ -93,20 +97,34 @@ export function Discover({
     if (!current || busy) return;
     setBusy(true);
     try {
-      const res = await addLike({ data: { userId: current.userId } });
+      const res = await addLike({
+        data: {
+          userId: current.userId,
+          likedOn,
+          note: likeNote.trim().slice(0, 200) || undefined,
+        },
+      });
       if (res.status === "rate_limited") {
-        // Limite anti-abus atteinte : on n'avance PAS (le like n'a pas été enregistré).
         setNotice(t("likeLimitReached"));
         return;
       }
       setNotice(null);
       if (res.status === "matched") {
+        // Mémoriser le commentaire pour un éventuel premier message contextuel
+        if (likeNote.trim() && typeof sessionStorage !== "undefined") {
+          sessionStorage.setItem(
+            `nayora:likeNote:${res.matchId}`,
+            likeNote.trim().slice(0, 200),
+          );
+        }
         setSpark(current);
         onMatched(current, res.matchId);
       }
       setIndex((i) => i + 1);
       setInsight(null);
       setIce(null);
+      setLikedOn("profile");
+      setLikeNote("");
     } finally {
       setBusy(false);
     }
@@ -186,16 +204,13 @@ export function Discover({
       />
       {notice && <p className="mb-3 rounded-xl bg-secondary px-3 py-2 text-sm text-primary">{notice}</p>}
       <CuratedSuggestions />
-      {/* 5 cartes du jour : les meilleurs matchs d'abord, exploration libre ensuite */}
       {index < 5 && cards.length > 0 && (
         <div className="mb-3 rounded-2xl border border-primary/30 bg-primary/5 px-3 py-2.5">
           <p className="flex items-center gap-1.5 text-xs font-medium text-primary">
             <Sparkles className="size-3.5" />
             {t("dailyTopTitle")}
           </p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">
-            {t("dailyTopLead")}
-          </p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">{t("dailyTopLead")}</p>
         </div>
       )}
       {index >= 5 && (
@@ -247,6 +262,11 @@ export function Discover({
                 </p>
                 {current.profession && (
                   <p className="mt-0.5 text-sm text-cream/70">{current.profession}</p>
+                )}
+                {current.reliabilityScore >= 70 && (
+                  <p className="mt-1 text-xs text-cream/70">
+                    ★ {t("reliability")} {current.reliabilityScore}
+                  </p>
                 )}
               </div>
               <button
@@ -333,6 +353,35 @@ export function Discover({
         </div>
       </SwipeCard>
 
+      <div className="mt-3 space-y-2">
+        <p className="text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          {t("likeOnTitle")}
+        </p>
+        <div className="flex flex-wrap justify-center gap-1.5">
+          {(["profile", "photo", "bio", "reason"] as const).map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setLikedOn(k)}
+              className={`rounded-full border px-2.5 py-1 text-xs min-h-[2.5rem] ${
+                likedOn === k
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground"
+              }`}
+            >
+              {t(`likeOn_${k}`)}
+            </button>
+          ))}
+        </div>
+        <input
+          type="text"
+          value={likeNote}
+          onChange={(e) => setLikeNote(e.target.value.slice(0, 200))}
+          placeholder={t("likeNotePh")}
+          maxLength={200}
+          className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+      </div>
       <div className="mt-4 flex items-center justify-center gap-5">
         <Button
           variant="outline"

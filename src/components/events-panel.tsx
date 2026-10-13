@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Calendar, MapPin, Users } from "lucide-react";
 import { listUpcomingEvents, rsvpEvent, type EventRow } from "@/lib/events";
 import { createEvent, getMyStaffRole } from "@/lib/admin";
-import { COUNTRY_CODES } from "@/lib/constants";
+import { COUNTRY_CODES, INTENTIONS } from "@/lib/constants";
 import { countryName, sortedCountryCodes } from "@/lib/i18n";
 import { useLang } from "@/lib/lang";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ export function EventsPanel() {
   const [events, setEvents] = useState<EventRow[] | null>(null);
   const [isStaff, setIsStaff] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [universeFilter, setUniverseFilter] = useState<string>("all");
 
   const load = useCallback(async () => {
     setEvents(await listUpcomingEvents());
@@ -47,13 +48,39 @@ export function EventsPanel() {
 
       {showForm && <CreateEventForm onCreated={() => { setShowForm(false); void load(); }} />}
 
+      <div className="mb-4 flex flex-wrap gap-1.5">
+        <button
+          type="button"
+          onClick={() => setUniverseFilter("all")}
+          className={`rounded-full border px-3 py-1.5 text-xs min-h-[2.5rem] ${
+            universeFilter === "all" ? "border-primary bg-primary/10 text-primary" : "border-border"
+          }`}
+        >
+          {t("all")}
+        </button>
+        {INTENTIONS.map((u) => (
+          <button
+            key={u}
+            type="button"
+            onClick={() => setUniverseFilter(u)}
+            className={`rounded-full border px-3 py-1.5 text-xs min-h-[2.5rem] ${
+              universeFilter === u ? "border-primary bg-primary/10 text-primary" : "border-border"
+            }`}
+          >
+            {t(u)}
+          </button>
+        ))}
+      </div>
+
       {events === null ? (
         <p className="text-sm text-muted-foreground">{t("loading")}</p>
-      ) : events.length === 0 ? (
+      ) : events.filter((ev) => universeFilter === "all" || ev.universe === universeFilter || (!ev.universe && universeFilter === "all")).length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("eventsEmpty")}</p>
       ) : (
         <div className="flex flex-col gap-3">
-          {events.map((e) => (
+          {events
+            .filter((ev) => universeFilter === "all" || ev.universe === universeFilter)
+            .map((e) => (
             <div key={e.id} className="rounded-2xl border border-border bg-card p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -76,6 +103,9 @@ export function EventsPanel() {
                   {e.capacity ? `/${e.capacity}` : ""}
                 </Badge>
               </div>
+              {e.universe && (
+                <Badge className="mt-2">{t(e.universe)}</Badge>
+              )}
               {e.description && (
                 <p className="mt-2 text-sm text-foreground/85">{e.description}</p>
               )}

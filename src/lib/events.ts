@@ -12,13 +12,15 @@ export type EventRow = {
   capacity: number | null;
   attendeeCount: number;
   going: boolean;
+  /** Univers NAYORA de l'événement (mariage, amitie, professionnel, voyage, projets) — optionnel. */
+  universe: string | null;
 };
 
 export const listUpcomingEvents = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }): Promise<EventRow[]> => {
     const sql = await getSql();
-    const rows = await sql.query<{
+    let rows: {
       id: number;
       title: string;
       description: string;
@@ -28,16 +30,32 @@ export const listUpcomingEvents = createServerFn({ method: "GET" })
       capacity: number | null;
       attendee_count: number;
       going: boolean;
-    }>(
-      `select e.id, e.title, e.description, e.city, e.country, e.starts_at, e.capacity,
-              (select count(*)::int from event_rsvps r where r.event_id = e.id) as attendee_count,
-              exists(select 1 from event_rsvps r where r.event_id = e.id and r.user_id = $1) as going
-       from events e
-       where e.starts_at > now()
-       order by e.starts_at asc
-       limit 100`,
-      [context.userId],
-    );
+      universe?: string | null;
+    }[];
+    try {
+      rows = await sql.query(
+        `select e.id, e.title, e.description, e.city, e.country, e.starts_at, e.capacity, e.universe,
+                (select count(*)::int from event_rsvps r where r.event_id = e.id) as attendee_count,
+                exists(select 1 from event_rsvps r where r.event_id = e.id and r.user_id = $1) as going
+         from events e
+         where e.starts_at > now()
+         order by e.starts_at asc
+         limit 100`,
+        [context.userId],
+      );
+    } catch {
+      // Colonne universe absente tant que la migration 0013 n'est pas appliquée.
+      rows = await sql.query(
+        `select e.id, e.title, e.description, e.city, e.country, e.starts_at, e.capacity,
+                (select count(*)::int from event_rsvps r where r.event_id = e.id) as attendee_count,
+                exists(select 1 from event_rsvps r where r.event_id = e.id and r.user_id = $1) as going
+         from events e
+         where e.starts_at > now()
+         order by e.starts_at asc
+         limit 100`,
+        [context.userId],
+      );
+    }
     return rows.map((r) => ({
       id: Number(r.id),
       title: r.title,
@@ -48,6 +66,7 @@ export const listUpcomingEvents = createServerFn({ method: "GET" })
       capacity: r.capacity === null ? null : Number(r.capacity),
       attendeeCount: Number(r.attendee_count ?? 0),
       going: Boolean(r.going),
+      universe: r.universe ?? null,
     }));
   });
 

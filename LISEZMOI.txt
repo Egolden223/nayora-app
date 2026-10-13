@@ -1,0 +1,21 @@
+NAYORA — Pack améliorations stratégiques (lot 1)
+
+Fichiers à uploader sur GitHub (garder les chemins) :
+  src/components/discover.tsx
+  src/components/events-panel.tsx
+  src/components/meetings-panel.tsx
+  src/lib/dating_final.ts
+  src/lib/events.ts
+  src/lib/i18n.ts
+  migrations/0013_like_on_events_universe.sql
+
+Contenu de ce lot :
+1. 5 cartes du jour (meilleurs matchs + exploration libre)
+2. Score de fiabilité visible sur les cartes Discover
+3. Like sur un élément (profil / photo / bio / compatibilité) + note optionnelle
+4. Events filtrables par univers
+5. Check-in sécurité RDV (partage à un proche)
+6. Idées de rendez-vous dans le panneau meetings
+7. Migration SQL 0013 (liked_on, note, events.universe)
+
+Après upload → réponds « ok » pour le déploiement Vercel.
