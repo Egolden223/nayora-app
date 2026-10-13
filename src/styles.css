@@ -4,6 +4,7 @@
 @theme {
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Jost", "Outfit", ui-sans-serif, system-ui, sans-serif;
+
   --color-background: #101c2c;
   --color-foreground: #f5f0e7;
   --color-card: #172740;
@@ -25,12 +26,14 @@
   --color-ring: #c9a45c;
   --color-cream: #f5f0e7;
   --color-plum: #0a121e;
+
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
   --radius-xl: 28px;
   --radius-2xl: 36px;
+
   --shadow-soft: 0 18px 40px -24px rgb(4 7 20 / 0.7);
 }
 
@@ -39,43 +42,70 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+
   * {
     border-color: var(--color-border);
+    box-sizing: border-box;
   }
+
   html {
     background: var(--color-background);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
+
   body {
     min-height: 100dvh;
     min-height: 100svh;
     background: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    padding-top: env(safe-area-inset-top);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    overflow-x: hidden;
   }
+
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  input, select, textarea, button {
+    font-size: 16px;
+  }
+}
+
+@layer components {
   .app-shell {
     width: 100%;
     max-width: 28rem;
     margin-left: auto;
     margin-right: auto;
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  @media (min-width: 480px) {
+    .app-shell { max-width: 30rem; }
   }
   @media (min-width: 640px) {
-    .app-shell { max-width: 32rem; }
+    .app-shell { max-width: 34rem; }
   }
   @media (min-width: 1024px) {
-    .app-shell { max-width: 36rem; }
+    .app-shell { max-width: 40rem; }
   }
-  h1, h2, h3, .font-display {
-    font-family: var(--font-display);
-    text-wrap: balance;
+  @media (min-width: 1280px) {
+    .app-shell { max-width: 42rem; }
   }
-  p {
-    text-wrap: pretty;
+  @media (max-height: 700px) {
+    .app-shell { /* denser on short screens */ }
+  }
+  @media (pointer: coarse) {
+    button, [role="button"] { touch-action: manipulation; }
   }
 }
 
@@ -84,5 +114,54 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* nayora responsive v2 */
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .app-shell {
+    max-width: 100%;
+  }
+  .discover-card-aspect {
+    aspect-ratio: 3 / 4;
+    max-height: min(62dvh, 520px);
+  }
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    max-width: 36rem;
+  }
+  .discover-card-aspect {
+    max-height: min(70dvh, 640px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-shell {
+    max-width: 42rem;
+  }
+  .discover-desktop-pad {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (pointer: coarse) {
+  button, [role="button"], a, summary {
+    min-height: 44px;
+  }
+  input, select, textarea {
+    min-height: 44px;
   }
 }
