@@ -9,6 +9,7 @@ import {
 } from "react";
 import { migrateLegacyStorage } from "@/lib/storage-migrate";
 import { isRtl, LANGS, t as tr, type Lang } from "@/lib/i18n";
+import { tExtra } from "@/lib/i18n_extra";
 
 const KEY = "nayora.lang";
 
@@ -47,7 +48,10 @@ export function LangProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const t = useCallback((key: string) => tr(lang, key), [lang]);
+  const t = useCallback(
+    (key: string) => tExtra(lang, key) ?? tr(lang, key),
+    [lang],
+  );
   const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
   return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
 }
