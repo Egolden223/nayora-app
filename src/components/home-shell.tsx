@@ -57,6 +57,7 @@ export function HomeShell({
     setMatches(list);
   }, []);
 
+  // Si l'univers actif n'est plus sur le profil, revenir au principal.
   useEffect(() => {
     const primary = me.universes[0] ?? me.intention ?? "mariage";
     if (!me.universes.includes(filters.intention)) {
@@ -113,7 +114,7 @@ export function HomeShell({
 
       <main className="flex-1 pb-20">
         {loading && tab === "discover" ? (
-          <div className="mx-auto mt-6 h-[50dvh] max-h-[420px] app-main animate-pulse rounded-[28px] bg-card" />
+          <div className="mx-auto mt-6 h-[70dvh] app-shell animate-pulse rounded-[28px] bg-card" />
         ) : tab === "discover" ? (
           <Discover
             me={me}

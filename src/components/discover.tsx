@@ -148,14 +148,14 @@ export function Discover({
 
   if (!current) {
     return (
-      <div className="mx-auto flex min-h-[70dvh] w-full max-w-sm flex-col items-center justify-center px-6 text-center">
+      <div className="mx-auto app-main px-4">
         <UniverseBar
-          className="mb-4 w-full"
+          className="mb-3 w-full"
           allowed={myUniverses}
           value={filters.intention}
           onChange={(v) => onFilters({ ...filters, intention: v, facet: "all", gender: "all", ageBand: "all", familyStatus: "all" })}
         />
-        <div className="mb-4 flex w-full justify-end">
+        <div className="mb-3 flex w-full justify-end">
           <IconBtn
             label={t("filters")}
             onClick={() => {
@@ -166,18 +166,23 @@ export function Discover({
             <SlidersHorizontal className="size-5" />
           </IconBtn>
         </div>
-        <h2 className="font-display text-3xl font-medium">{t("endOfDeck")}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{t("endOfDeckLead")}</p>
-        <Button
-          className="mt-6"
-          variant="outline"
-          onClick={() => {
-            onFilters(emptyFiltersFor(filters.intention || myUniverses[0]));
-            onRefresh();
-          }}
-        >
-          {t("widen")}
-        </Button>
+        <div className="discover-empty">
+          <div className="mb-4 grid size-16 place-items-center rounded-full border border-border bg-card text-primary">
+            <Sparkles className="size-7" />
+          </div>
+          <h2 className="font-display text-2xl font-medium sm:text-3xl">{t("endOfDeck")}</h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">{t("endOfDeckLead")}</p>
+          <Button
+            className="mt-6 min-h-[2.75rem]"
+            variant="outline"
+            onClick={() => {
+              onFilters(emptyFiltersFor(filters.intention || myUniverses[0]));
+              onRefresh();
+            }}
+          >
+            {t("widen")}
+          </Button>
+        </div>
         {filtersOpen && (
           <FilterSheet
             draft={draft}
@@ -195,7 +200,7 @@ export function Discover({
   }
 
   return (
-    <div className="mx-auto app-shell px-4 pb-4">
+    <div className="mx-auto app-main px-4 pb-4">
       <UniverseBar
         className="mb-3"
         allowed={myUniverses}
@@ -237,7 +242,7 @@ export function Discover({
       </div>
 
       <SwipeCard onLike={like} onPass={pass}>
-        <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[28px] border border-border bg-card shadow-[var(--shadow-soft)]">
+        <div className="discover-card-frame">
           <ProfilePhoto
             name={current.firstName}
             seed={current.userId}

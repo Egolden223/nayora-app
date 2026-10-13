@@ -89,12 +89,15 @@
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
   }
+  /* Tablette */
   @media (min-width: 640px) {
     .app-shell { max-width: 32rem; }
   }
+  /* PC portable */
   @media (min-width: 1024px) {
-    .app-shell { max-width: 28rem; }
+    .app-shell { max-width: 28rem; } /* carte swipe reste confortable */
   }
+  /* Grand écran : colonne centrale + respiration */
   @media (min-width: 1280px) {
     .app-shell { max-width: 30rem; }
   }
@@ -102,6 +105,7 @@
     button, [role="button"] { touch-action: manipulation; }
   }
 
+  /* Zone principale Discover / panels */
   .app-main {
     width: 100%;
     max-width: 28rem;
@@ -124,6 +128,7 @@
     .app-main { max-width: 48rem; }
   }
 
+  /* État vide Discover — pas de trou géant sur PC */
   .discover-empty {
     display: flex;
     flex-direction: column;
@@ -145,6 +150,7 @@
     }
   }
 
+  /* Carte swipe : hauteur bornée selon l’écran */
   .discover-card-frame {
     position: relative;
     width: 100%;
@@ -171,6 +177,7 @@
     }
   }
 
+  /* Nav bas centrée et limitée en largeur sur grand écran */
   .app-bottom-nav {
     max-width: 36rem;
     margin-left: auto;
@@ -189,6 +196,7 @@
   }
 }
 
+/* nayora responsive v2 */
 @layer utilities {
   .scrollbar-none {
     -ms-overflow-style: none;
@@ -214,6 +222,7 @@
   }
 }
 
+/* PC : fond un peu plus « app » centrée, moins de bande noire vide */
 @media (min-width: 1024px) {
   body {
     background:
