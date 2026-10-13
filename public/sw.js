@@ -1,6 +1,6 @@
-// NAYORA — service worker (v3).
+// NAYORA — service worker (v4).
 // Bump CACHE_NAME on every shell/auth fix so activate() drops stale caches.
-const CACHE_NAME = "nayora-shell-v3";
+const CACHE_NAME = "nayora-shell-v4";
 const PRECACHE_URLS = [
   "/manifest.webmanifest",
   "/favicon.png",
