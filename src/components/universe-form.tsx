@@ -154,16 +154,39 @@ function SchemaField({
       </div>
     );
   }
-  if (spec.kind === "text") {
+  if (spec.kind === "date") {
     return (
       <div>
         <Label>{t(spec.label)}</Label>
-        <Textarea
-          rows={3}
-          maxLength={spec.max}
+        <Input
+          type="date"
           value={typeof value === "string" ? value : ""}
-          onChange={(e) => onChange({ [spec.key]: e.target.value || undefined } as Partial<UniverseData>)}
+          onChange={(e) =>
+            onChange({ [spec.key]: e.target.value || undefined } as Partial<UniverseData>)
+          }
         />
+      </div>
+    );
+  }
+  if (spec.kind === "text") {
+    const isShort = (spec.max ?? 200) <= 80;
+    return (
+      <div>
+        <Label>{t(spec.label)}</Label>
+        {isShort ? (
+          <Input
+            maxLength={spec.max}
+            value={typeof value === "string" ? value : ""}
+            onChange={(e) => onChange({ [spec.key]: e.target.value || undefined } as Partial<UniverseData>)}
+          />
+        ) : (
+          <Textarea
+            rows={3}
+            maxLength={spec.max}
+            value={typeof value === "string" ? value : ""}
+            onChange={(e) => onChange({ [spec.key]: e.target.value || undefined } as Partial<UniverseData>)}
+          />
+        )}
       </div>
     );
   }
@@ -290,6 +313,8 @@ export function UniverseFacts({ universe, data }: { universe: string; data: Univ
       one("poly_", data.polygamy);
       one("lh_", data.loveHorizon);
       many(data.values, 3, (x) => t("vl_" + x));
+      if (data.originCountry) items.push(t("lbl_originShort") + ": " + countryName(lang, data.originCountry));
+      if (data.openToDiaspora === "oui") items.push(t("yn_oui_diaspora"));
       break;
     case "professionnel":
       one("pg_", data.proGoal);
@@ -307,6 +332,18 @@ export function UniverseFacts({ universe, data }: { universe: string; data: Univ
       many(data.travelStyles, 2, (x) => t("ts_" + x));
       many(data.travelDestinations, 3, (x) => countryName(lang, x));
       one("tw_", data.travelWhen);
+      if (data.travelDateFrom && data.travelDateTo) {
+        items.push(`${data.travelDateFrom} → ${data.travelDateTo}`);
+      }
+      if (data.passportCity || data.passportCountry) {
+        items.push(
+          t("lbl_passportShort") +
+            ": " +
+            [data.passportCity, data.passportCountry ? countryName(lang, data.passportCountry) : ""]
+              .filter(Boolean)
+              .join(", "),
+        );
+      }
       break;
     case "projets":
       one("pr_", data.projectRole);

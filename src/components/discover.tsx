@@ -202,6 +202,7 @@ export function Discover({
         value={filters.intention}
         onChange={(v) => onFilters({ ...filters, intention: v, facet: "all", gender: "all", ageBand: "all", familyStatus: "all" })}
       />
+      <FindMeBox filters={filters} onFilters={onFilters} />
       {notice && <p className="mb-3 rounded-xl bg-secondary px-3 py-2 text-sm text-primary">{notice}</p>}
       <CuratedSuggestions />
       {index < 5 && cards.length > 0 && (
@@ -267,6 +268,9 @@ export function Discover({
                   <p className="mt-1 text-xs text-cream/70">
                     ★ {t("reliability")} {current.reliabilityScore}
                   </p>
+                )}
+                {current.reportFlag && (
+                  <p className="mt-1 text-xs text-amber-200/90">⚠ {t("reportFlagHint")}</p>
                 )}
               </div>
               <button
@@ -564,6 +568,37 @@ function FilterSheet({
             {t("verifiedOnly")}
             {draft.verifiedOnly && <span className="ml-auto text-primary">✓</span>}
           </button>
+          {(isLove || isFriends) && (
+            <button
+              type="button"
+              aria-pressed={Boolean(draft.diasporaOnly)}
+              onClick={() => setDraft({ ...draft, diasporaOnly: !draft.diasporaOnly })}
+              className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm min-h-[2.75rem] ${
+                draft.diasporaOnly ? "border-primary bg-card" : "border-border"
+              }`}
+            >
+              {t("diasporaOnly")}
+              {draft.diasporaOnly && <span className="ml-auto text-primary">✓</span>}
+            </button>
+          )}
+          {isTravel && (
+            <div className="space-y-1.5">
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {t("lbl_passportCountry")}
+              </p>
+              <FieldSelect
+                value={draft.passportCountry ?? "all"}
+                onChange={(v) => setDraft({ ...draft, passportCountry: v === "all" ? undefined : v })}
+              >
+                <option value="all">{t("all")}</option>
+                {sortedCountryCodes(lang, COUNTRY_CODES).map((c) => (
+                  <option key={c} value={c}>
+                    {countryName(lang, c)}
+                  </option>
+                ))}
+              </FieldSelect>
+            </div>
+          )}
           {facet && (
             <div className="space-y-1.5">
               <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -726,6 +761,58 @@ function SwipeCard({
       onPointerCancel={onUp}
     >
       {children}
+    </div>
+  );
+}
+
+
+/** Recherche simple en langage naturel → filtres (sans IA externe). */
+function FindMeBox({
+  filters,
+  onFilters,
+}: {
+  filters: DiscoverFilters;
+  onFilters: (f: DiscoverFilters) => void;
+}) {
+  const { t, lang } = useLang();
+  const [q, setQ] = useState("");
+  const apply = () => {
+    const raw = q.trim().toLowerCase();
+    if (!raw) return;
+    const next = { ...filters };
+    // Genre
+    if (/\b(femme|women|mujer|mulher|أنثى)\b/.test(raw)) next.gender = "femme";
+    else if (/\b(homme|men|hombre|homem|ذكر)\b/.test(raw)) next.gender = "homme";
+    // Vérifiés
+    if (/vérif|verif|verified|موثق/.test(raw)) next.verifiedOnly = true;
+    // Diaspora
+    if (/diaspora|origine|origin/.test(raw)) next.diasporaOnly = true;
+    // Tranche d'âge simple
+    for (const band of AGE_BANDS) {
+      if (raw.includes(band)) next.ageBand = band;
+    }
+    // Pays (code ou nom approximatif via COUNTRY_CODES — match code en majuscules dans la requête)
+    const upper = q.toUpperCase();
+    for (const code of COUNTRY_CODES) {
+      if (upper.includes(code) || raw.includes(code.toLowerCase())) {
+        if (!next.countries.includes(code)) next.countries = [...next.countries, code];
+      }
+    }
+    onFilters(next);
+  };
+  return (
+    <div className="mb-3 flex gap-2">
+      <input
+        type="search"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && apply()}
+        placeholder={t("findMePh")}
+        className="min-h-[2.75rem] flex-1 rounded-xl border border-border bg-card px-3 text-sm outline-none focus:border-primary"
+      />
+      <Button type="button" size="sm" variant="outline" onClick={apply}>
+        {t("findMeCta")}
+      </Button>
     </div>
   );
 }

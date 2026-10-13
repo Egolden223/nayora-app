@@ -5,6 +5,7 @@ import {
   sanitizeUniverseData,
   scoreUniverse,
   travelIncompatible,
+  diasporaBonus,
   UNIVERSE_FACETS,
   type UniverseData,
 } from "@/lib/universe-match";
@@ -101,6 +102,8 @@ export type DiscoverCard = Profile & {
   matchUniverse: string;
   /** Clés i18n `r_*` expliquant pourquoi (objectifs complémentaires, centres d'intérêt communs…). */
   reasons: string[];
+  /** True si plusieurs signalements anonymes (seuil de confiance). */
+  reportFlag?: boolean;
 };
 
 export type MatchRow = {
@@ -518,6 +521,10 @@ export type DiscoverFilters = {
   facet?: string;
   /** Ne montrer que les profils dont le selfie a été contrôlé. */
   verifiedOnly?: boolean;
+  /** Mode diaspora : prioriser / filtrer les profils même origine à l'étranger. */
+  diasporaOnly?: boolean;
+  /** Passeport : apparaître comme si on était dans ce pays (filtre pays de destination). */
+  passportCountry?: string;
 };
 
 export const listDiscover = createServerFn({ method: "POST" })
@@ -554,6 +561,20 @@ export const listDiscover = createServerFn({ method: "POST" })
       [context.userId],
     );
     const liked = new Set(likedRows.map((r) => r.liked_id));
+
+    // Signalements anonymisés : profils avec ≥ 2 reports distincts
+    let reportedHeavy = new Set<string>();
+    try {
+      const repRows = await sql.query<{ reported_id: string; c: number }>(
+        `select reported_id, count(distinct reporter_id)::int as c
+         from reports
+         group by reported_id
+         having count(distinct reporter_id) >= 2`,
+      );
+      reportedHeavy = new Set(repRows.map((r) => r.reported_id));
+    } catch {
+      /* table absente en dev */
+    }
 
     const wantedUniverse =
       data.intention && data.intention !== "all" ? data.intention : null;
@@ -604,12 +625,21 @@ export const listDiscover = createServerFn({ method: "POST" })
         } else m = scoreUniverse(u, me, p);
         if (m.score > best.score) best = { universe: u, score: m.score, reasons: m.reasons };
       }
+      // Bonus diaspora (Love / Friends)
+      let score = best.score || compatibilityScore(me, p);
+      let reasons = [...best.reasons];
+      if (best.universe === "mariage" || best.universe === "amitie") {
+        const dia = diasporaBonus(me, p);
+        score = Math.min(98, score + dia.score);
+        reasons = [...reasons, ...dia.reasons];
+      }
       return {
         ...p,
         alreadyLiked: liked.has(p.userId),
-        score: best.score || compatibilityScore(me, p),
+        score,
         matchUniverse: best.universe,
-        reasons: best.reasons,
+        reasons,
+        reportFlag: reportedHeavy.has(p.userId),
       };
     });
 
@@ -638,6 +668,18 @@ export const listDiscover = createServerFn({ method: "POST" })
         return false;
       if (data.countries?.length && !data.countries.includes(c.country))
         return false;
+      // Passeport : traiter passportCountry du filtre comme pays de présence
+      if (data.passportCountry && data.passportCountry !== "all") {
+        const theirPass = c.universeData.passportCountry || c.country;
+        if (theirPass !== data.passportCountry && c.country !== data.passportCountry) return false;
+      }
+      if (data.diasporaOnly) {
+        const myOrigin = me.universeData.originCountry || me.country;
+        const theirOrigin = c.universeData.originCountry || c.country;
+        const open =
+          me.universeData.openToDiaspora === "oui" || c.universeData.openToDiaspora === "oui";
+        if (!myOrigin || theirOrigin !== myOrigin || !open) return false;
+      }
       if (
         data.familyStatus &&
         data.familyStatus !== "all" &&

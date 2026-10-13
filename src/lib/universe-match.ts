@@ -36,6 +36,7 @@ export const TRAVEL_GOALS = ["compagnon", "chercher_guide", "guide"] as const;
 export const TRAVEL_STYLES = ["culture", "aventure", "detente", "gastronomie", "roadtrip", "festival"] as const;
 export const TRAVEL_WHEN = ["30j", "3m", "annee", "flex"] as const;
 export const TRAVEL_BUDGETS = ["eco", "confort", "premium"] as const;
+export const YES_NO = ["oui", "non"] as const;
 
 export const PROJECT_ROLES = ["porteur", "rejoindre", "transmettre", "apprendre"] as const;
 /** Rôle complémentaire parfait (best) et partiel. */
@@ -72,6 +73,13 @@ export type UniverseData = {
   travelBudget?: string;
   companionGender?: string;
   tripDuration?: string;
+  travelDateFrom?: string;
+  travelDateTo?: string;
+  passportCity?: string;
+  passportCountry?: string;
+  // Diaspora
+  originCountry?: string;
+  openToDiaspora?: string;
   // Projects
   projectRole?: string;
   projectDomain?: string;
@@ -104,7 +112,7 @@ export type UniverseData = {
 
 export type FieldSpec = {
   key: keyof UniverseData;
-  kind: "single" | "multi" | "int" | "text";
+  kind: "single" | "multi" | "int" | "text" | "date";
   /** Liste fermée d'options, ou 'domains' / 'countries' (fournis par l'appelant). */
   source: readonly string[] | "domains" | "countries";
   /** multi : nb max de choix · text : longueur max. */
@@ -179,6 +187,8 @@ export const UNIVERSE_FORMS: Record<string, FormSpec> = {
     groups: ["lbl_g_about", "lbl_g_values", "lbl_g_seeking"],
     common: [
       f("hasChildren", "single", CHILDREN, "lbl_hasChildren", "kids_", { group: "lbl_g_about" }),
+      f("originCountry", "single", "countries", "lbl_originCountry", "", { group: "lbl_g_about", hint: "hint_originCountry" }),
+      f("openToDiaspora", "single", YES_NO, "lbl_openToDiaspora", "yn_", { hint: "hint_diaspora" }),
       f("interests", "multi", INTERESTS, "lbl_interests", "int_", { max: 6 }),
       f("religion", "single", RELIGIONS, "lbl_religion", "rel_", { group: "lbl_g_values", hint: "sensitiveHint" }),
       f("faithPractice", "single", FAITH_PRACTICE, "lbl_faithPractice", "fp_"),
@@ -237,6 +247,8 @@ export const UNIVERSE_FORMS: Record<string, FormSpec> = {
     common: [
       f("interests", "multi", INTERESTS, "lbl_interests", "int_", { max: 6 }),
       f("socialVibe", "single", SOCIAL_VIBES, "lbl_socialVibe", "sv_"),
+      f("originCountry", "single", "countries", "lbl_originCountry", "", { hint: "hint_originCountry" }),
+      f("openToDiaspora", "single", YES_NO, "lbl_openToDiaspora", "yn_", { hint: "hint_diaspora" }),
     ],
     byGoal: {
       cercle: [f("groupFormat", "single", GROUP_FORMATS, "lbl_groupFormat", "gf_")],
@@ -249,19 +261,29 @@ export const UNIVERSE_FORMS: Record<string, FormSpec> = {
     common: [
       f("travelStyles", "multi", TRAVEL_STYLES, "lbl_travelStyles", "ts_", { max: 4 }),
       f("companionGender", "single", COMPANION_GENDER, "lbl_companionGender", "cg_"),
+      f("passportCountry", "single", "countries", "lbl_passportCountry", "", { hint: "hint_passport" }),
+      f("passportCity", "text", [], "lbl_passportCity", "", { max: 80, hint: "hint_passportCity" }),
     ],
     byGoal: {
       compagnon: [
         f("travelDestinations", "multi", "countries", "lbl_travelDestinations", "", { max: 3 }),
         f("travelWhen", "single", TRAVEL_WHEN, "lbl_travelWhen", "tw_"),
+        f("travelDateFrom", "date", [], "lbl_travelDateFrom", "", { hint: "hint_travelDates" }),
+        f("travelDateTo", "date", [], "lbl_travelDateTo", ""),
         f("tripDuration", "single", TRIP_DURATIONS, "lbl_tripDuration", "td_"),
         f("travelBudget", "single", TRAVEL_BUDGETS, "lbl_travelBudget", "bd_"),
       ],
       chercher_guide: [
         f("travelDestinations", "multi", "countries", "lbl_destGuideWanted", "", { max: 3 }),
         f("travelWhen", "single", TRAVEL_WHEN, "lbl_travelWhen", "tw_"),
+        f("travelDateFrom", "date", [], "lbl_travelDateFrom", ""),
+        f("travelDateTo", "date", [], "lbl_travelDateTo", ""),
       ],
-      guide: [f("travelDestinations", "multi", "countries", "lbl_destGuideOffer", "", { max: 3 })],
+      guide: [
+        f("travelDestinations", "multi", "countries", "lbl_destGuideOffer", "", { max: 3 }),
+        f("travelDateFrom", "date", [], "lbl_travelDateFrom", ""),
+        f("travelDateTo", "date", [], "lbl_travelDateTo", ""),
+      ],
     },
   },
   projets: {
@@ -385,6 +407,9 @@ export function sanitizeUniverseData(
         const n = typeof v === "number" ? v : typeof v === "string" && v.trim() !== "" ? Number(v) : NaN;
         const [lo, hi] = spec.range ?? [0, 999];
         if (Number.isInteger(n) && n >= lo && n <= hi) out[spec.key] = n;
+      } else if (spec.kind === "date") {
+        const d = typeof v === "string" ? v.trim().slice(0, 10) : "";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(d)) out[spec.key] = d;
       } else if (spec.kind === "text") {
         const t = cleanText(v, spec.max ?? 200);
         if (t) out[spec.key] = t;
@@ -526,6 +551,17 @@ export function scoreUniverse(universe: string, me: MatchSubject, them: MatchSub
             reasons.push("r_timing");
           } else if (a.travelWhen === "flex" || b.travelWhen === "flex") score += 4;
         }
+        if (
+          a.travelDateFrom &&
+          a.travelDateTo &&
+          b.travelDateFrom &&
+          b.travelDateTo &&
+          a.travelDateFrom <= b.travelDateTo &&
+          b.travelDateFrom <= a.travelDateTo
+        ) {
+          score += 18;
+          reasons.push("r_dateOverlap");
+        }
         if (a.tripDuration && a.tripDuration === b.tripDuration) {
           score += 6;
           reasons.push("r_duration");
@@ -601,6 +637,24 @@ export function loveDealbreaker(me: MatchSubject, them: MatchSubject): boolean {
 }
 
 /** Travel — cercle réservé aux femmes : l'un des deux le demande, l'autre n'est pas une femme. */
+
+/** Bonus diaspora : même pays d'origine, ouverts à se rencontrer à l'étranger. */
+export function diasporaBonus(me: MatchSubject, them: MatchSubject): { score: number; reasons: string[] } {
+  const a = me.universeData;
+  const b = them.universeData;
+  const myOrigin = a.originCountry || me.country;
+  const theirOrigin = b.originCountry || them.country;
+  if (!myOrigin || !theirOrigin) return { score: 0, reasons: [] };
+  const open = a.openToDiaspora === "oui" || b.openToDiaspora === "oui";
+  if (myOrigin === theirOrigin && me.country !== them.country && open) {
+    return { score: 14, reasons: ["r_diaspora"] };
+  }
+  if (myOrigin === theirOrigin && open) {
+    return { score: 6, reasons: ["r_sameOrigin"] };
+  }
+  return { score: 0, reasons: [] };
+}
+
 export function travelIncompatible(me: MatchSubject, them: MatchSubject): boolean {
   const wantsWomen = (d?: UniverseData) => d?.companionGender === "femmes";
   if (wantsWomen(me.universeData) && them.gender && them.gender !== "femme") return true;

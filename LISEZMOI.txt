@@ -1,21 +1,17 @@
-NAYORA — Pack améliorations stratégiques (lot 1)
+NAYORA — Lot 2 (Travel / Diaspora / Confiance / Recherche)
 
-Fichiers à uploader sur GitHub (garder les chemins) :
-  src/components/discover.tsx
-  src/components/events-panel.tsx
-  src/components/meetings-panel.tsx
+Fichiers à uploader (garder les chemins) :
+  src/lib/universe-match.ts
+  src/components/universe-form.tsx
   src/lib/dating_final.ts
-  src/lib/events.ts
+  src/components/discover.tsx
   src/lib/i18n.ts
-  migrations/0013_like_on_events_universe.sql
 
-Contenu de ce lot :
-1. 5 cartes du jour (meilleurs matchs + exploration libre)
-2. Score de fiabilité visible sur les cartes Discover
-3. Like sur un élément (profil / photo / bio / compatibilité) + note optionnelle
-4. Events filtrables par univers
-5. Check-in sécurité RDV (partage à un proche)
-6. Idées de rendez-vous dans le panneau meetings
-7. Migration SQL 0013 (liked_on, note, events.universe)
+Contenu :
+1. Travel : dates concrètes de séjour + score d'overlap
+2. Passeport : pays/ville avant d'y être (filtre Discover)
+3. Mode diaspora : pays d'origine + ouverture + filtre + bonus matching
+4. Signalements anonymisés : alerte si ≥ 2 reporters distincts
+5. « Trouve-moi » : recherche simple en langage naturel → filtres
 
-Après upload → réponds « ok » pour le déploiement Vercel.
+Après upload → réponds « ok » pour le déploiement Vercel groupé (lot1 + lot2).
