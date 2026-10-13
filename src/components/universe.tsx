@@ -45,10 +45,10 @@ export function UniverseBar({
             aria-selected={active}
             onClick={() => onChange(key)}
             className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors min-h-[2.5rem]",
+              "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors min-h-[2.5rem]",
               active
                 ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                : "border-border bg-card text-muted-foreground hover:border-primary/40",
             )}
           >
             {Icon && <Icon className="size-3.5" strokeWidth={1.8} />}
