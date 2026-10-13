@@ -57,7 +57,6 @@ export function HomeShell({
     setMatches(list);
   }, []);
 
-  // Si l'univers actif n'est plus sur le profil, revenir au principal.
   useEffect(() => {
     const primary = me.universes[0] ?? me.intention ?? "mariage";
     if (!me.universes.includes(filters.intention)) {
@@ -105,16 +104,14 @@ export function HomeShell({
       <div className="mx-auto app-shell px-4 pt-4">
         <InstallPrompt />
       </div>
-      {tab === "discover" && (
-        <header className="mx-auto flex app-shell items-center justify-between px-4 pb-1 pt-4">
-          <Wordmark compact markClassName="text-[1.7rem]" />
-          <LanguageSwitch compact />
-        </header>
-      )}
+      <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 pb-1 pt-3 sm:px-6">
+        <Wordmark compact markClassName="text-[1.7rem]" />
+        <LanguageSwitch compact />
+      </header>
 
       <main className="flex-1 pb-20">
         {loading && tab === "discover" ? (
-          <div className="mx-auto mt-6 h-[70dvh] app-shell animate-pulse rounded-[28px] bg-card" />
+          <div className="mx-auto mt-4 h-[42dvh] max-h-[380px] w-full max-w-md animate-pulse rounded-[28px] bg-card" />
         ) : tab === "discover" ? (
           <Discover
             me={me}
