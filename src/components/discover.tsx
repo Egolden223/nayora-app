@@ -33,17 +33,17 @@ import { UniverseBar } from "@/components/universe";
 import { UniverseFacts } from "@/components/universe-form";
 import { UNIVERSE_FACETS } from "@/lib/universe-match";
 
-const EMPTY_FILTERS: DiscoverFilters = {
+const emptyFiltersFor = (intention: string): DiscoverFilters => ({
   ageBand: "all",
   gender: "all",
-  intention: "all",
+  intention,
   countries: [],
   familyStatus: "all",
   facet: "all",
-};
+});
 
 export function Discover({
-  me: _me,
+  me,
   cards,
   filters,
   onFilters,
@@ -58,6 +58,7 @@ export function Discover({
   onMatched: (partner: DiscoverCard, matchId: number) => void;
 }) {
   const { t, lang } = useLang();
+  const myUniverses = me.universes?.length ? me.universes : [me.intention || "mariage"];
   const [index, setIndex] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draft, setDraft] = useState(filters);
@@ -132,8 +133,9 @@ export function Discover({
       <div className="mx-auto flex min-h-[70dvh] w-full max-w-sm flex-col items-center justify-center px-6 text-center">
         <UniverseBar
           className="mb-4 w-full"
+          allowed={myUniverses}
           value={filters.intention}
-          onChange={(v) => onFilters({ ...filters, intention: v, facet: "all" })}
+          onChange={(v) => onFilters({ ...filters, intention: v, facet: "all", gender: "all", ageBand: "all", familyStatus: "all" })}
         />
         <div className="mb-4 flex w-full justify-end">
           <IconBtn
@@ -152,7 +154,7 @@ export function Discover({
           className="mt-6"
           variant="outline"
           onClick={() => {
-            onFilters(EMPTY_FILTERS);
+            onFilters(emptyFiltersFor(filters.intention || myUniverses[0]));
             onRefresh();
           }}
         >
@@ -177,8 +179,9 @@ export function Discover({
     <div className="mx-auto app-shell px-4 pb-4">
       <UniverseBar
         className="mb-3"
+        allowed={myUniverses}
         value={filters.intention}
-        onChange={(v) => onFilters({ ...filters, intention: v, facet: "all" })}
+        onChange={(v) => onFilters({ ...filters, intention: v, facet: "all", gender: "all", ageBand: "all", familyStatus: "all" })}
       />
       {notice && <p className="mb-3 rounded-xl bg-secondary px-3 py-2 text-sm text-primary">{notice}</p>}
       <CuratedSuggestions />
@@ -384,6 +387,7 @@ export function Discover({
         <FilterSheet
           draft={draft}
           setDraft={setDraft}
+          universe={filters.intention}
           onClose={() => setFiltersOpen(false)}
           onApply={() => {
             onFilters(draft);
@@ -419,50 +423,71 @@ function IconBtn({
 function FilterSheet({
   draft,
   setDraft,
+  universe,
   onClose,
   onApply,
 }: {
   draft: DiscoverFilters;
   setDraft: (f: DiscoverFilters) => void;
+  universe: string;
   onClose: () => void;
   onApply: () => void;
 }) {
   const { t, lang } = useLang();
   const set = (key: keyof DiscoverFilters, value: string) =>
     setDraft({ ...draft, [key]: value });
+  // Filtres adaptés à l'univers actif (pas de sélecteur d'univers ici).
+  const isLove = universe === "mariage";
+  const isFriends = universe === "amitie";
+  const isPro = universe === "professionnel";
+  const isTravel = universe === "voyage";
+  const isProjects = universe === "projets";
+  const facet = UNIVERSE_FACETS[universe];
+
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-plum/60 sm:items-center sm:justify-center">
-      <div className="w-full max-w-md rounded-t-[28px] border border-border bg-card p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:rounded-[28px]">
+      <div className="w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-t-[28px] border border-border bg-card p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:rounded-[28px]">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-display text-2xl">{t("filters")}</h3>
+          <div>
+            <h3 className="font-display text-2xl">{t("filters")}</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {t("filtersInUniverse")} — {t(universe)}
+            </p>
+          </div>
           <button type="button" onClick={onClose} className="text-sm text-muted-foreground">
             {t("keepBrowsing")}
           </button>
         </div>
         <div className="space-y-3">
-          <Field
-            label={t("gender")}
-            value={draft.gender}
-            onChange={(v) => set("gender", v)}
-            options={["all", ...GENDERS]}
-          />
-          <Field
-            label={t("ageBand")}
-            value={draft.ageBand}
-            onChange={(v) => set("ageBand", v)}
-            options={["all", ...AGE_BANDS]}
-          />
-          <Field
-            label={t("intention")}
-            value={draft.intention}
-            onChange={(v) => setDraft({ ...draft, intention: v, facet: "all" })}
-            options={["all", ...INTENTIONS]}
-          />
+          {(isLove || isFriends) && (
+            <Field
+              label={t("gender")}
+              value={draft.gender}
+              onChange={(v) => set("gender", v)}
+              options={["all", ...GENDERS]}
+            />
+          )}
+          {(isLove || isFriends || isTravel) && (
+            <Field
+              label={t("ageBand")}
+              value={draft.ageBand}
+              onChange={(v) => set("ageBand", v)}
+              options={["all", ...AGE_BANDS]}
+            />
+          )}
+          {isLove && (
+            <Field
+              label={t("family")}
+              value={draft.familyStatus}
+              onChange={(v) => set("familyStatus", v)}
+              options={["all", ...FAMILY_STATUSES]}
+            />
+          )}
           <button
             type="button"
             aria-pressed={Boolean(draft.verifiedOnly)}
             onClick={() => setDraft({ ...draft, verifiedOnly: !draft.verifiedOnly })}
-            className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm ${
+            className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm min-h-[2.75rem] ${
               draft.verifiedOnly ? "border-primary bg-card" : "border-border"
             }`}
           >
@@ -470,19 +495,19 @@ function FilterSheet({
             {t("verifiedOnly")}
             {draft.verifiedOnly && <span className="ml-auto text-primary">✓</span>}
           </button>
-          {UNIVERSE_FACETS[draft.intention] && (
+          {facet && (
             <div className="space-y-1.5">
               <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                {t(UNIVERSE_FACETS[draft.intention].label)}
+                {t(facet.label)}
               </p>
               <FieldSelect
                 value={draft.facet ?? "all"}
                 onChange={(v) => set("facet", v)}
               >
                 <option value="all">{t("all")}</option>
-                {UNIVERSE_FACETS[draft.intention].options.map((o) => (
+                {facet.options.map((o) => (
                   <option key={o} value={o}>
-                    {t(UNIVERSE_FACETS[draft.intention].prefix + o)}
+                    {t(facet.prefix + o)}
                   </option>
                 ))}
               </FieldSelect>
@@ -493,7 +518,7 @@ function FilterSheet({
               {t("countries")}
             </p>
             <details className="group rounded-2xl border border-border bg-secondary/40">
-              <summary className="flex cursor-pointer list-none items-center justify-between px-3.5 py-2.5 text-sm">
+              <summary className="flex cursor-pointer list-none items-center justify-between px-3.5 py-2.5 text-sm min-h-[2.75rem]">
                 <span>
                   {draft.countries.length === 0
                     ? t("allCountries")
@@ -514,7 +539,7 @@ function FilterSheet({
                 {sortedCountryCodes(lang, COUNTRY_CODES).map((c) => (
                   <label
                     key={c}
-                    className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-secondary"
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-secondary min-h-[2.5rem]"
                   >
                     <input
                       type="checkbox"
@@ -527,7 +552,7 @@ function FilterSheet({
                             : draft.countries.filter((x) => x !== c),
                         })
                       }
-                      className="accent-primary"
+                      className="accent-primary size-4"
                     />
                     {countryName(lang, c)}
                   </label>
@@ -535,17 +560,21 @@ function FilterSheet({
               </div>
             </details>
           </div>
-          <Field
-            label={t("family")}
-            value={draft.familyStatus}
-            onChange={(v) => set("familyStatus", v)}
-            options={["all", ...FAMILY_STATUSES]}
-          />
         </div>
         <div className="mt-5 grid grid-cols-2 gap-3">
           <Button
             variant="outline"
-            onClick={() => setDraft(EMPTY_FILTERS)}
+            onClick={() =>
+              setDraft({
+                ageBand: "all",
+                gender: "all",
+                intention: universe,
+                countries: [],
+                familyStatus: "all",
+                facet: "all",
+                verifiedOnly: false,
+              })
+            }
           >
             {t("resetFilters")}
           </Button>

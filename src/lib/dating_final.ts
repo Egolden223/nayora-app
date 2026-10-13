@@ -526,6 +526,13 @@ export const listDiscover = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const me = await loadProfile(context.userId);
     if (!me) return [] as DiscoverCard[];
+    // Isolation par univers : toujours un univers concret (pas « tous »).
+    if (!data.intention || data.intention === "all") {
+      data = {
+        ...data,
+        intention: me.universes[0] ?? me.intention ?? "mariage",
+      };
+    }
     const sql = await getSql();
     const rows = await sql.query<ProfileRow>(
       `select * from profiles p
