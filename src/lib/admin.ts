@@ -187,6 +187,35 @@ export const setStaffRole = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+/** Moderator+: activer ou retirer Prestige (abonnement). */
+export const setPremium = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: { userId: string; isPremium: boolean }) => input)
+  .handler(async ({ context, data }) => {
+    await requireStaff(context.userId, "moderator");
+    const sql = await getSql();
+    await sql.query(
+      "update profiles set is_premium = $2, updated_at = now() where user_id = $1",
+      [data.userId, data.isPremium],
+    );
+    return { ok: true as const };
+  });
+
+/** Moderator+: offrir un bonus chat (conversation débloquée sans Prestige). */
+export const grantBonusChatsAdmin = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: { userId: string; amount?: number }) => input)
+  .handler(async ({ context, data }) => {
+    await requireStaff(context.userId, "moderator");
+    const amount = Math.max(1, Math.min(10, data.amount ?? 1));
+    const sql = await getSql();
+    await sql.query(
+      "update profiles set bonus_chats = coalesce(bonus_chats, 0) + $2, updated_at = now() where user_id = $1",
+      [data.userId, amount],
+    );
+    return { ok: true as const };
+  });
+
 export type AdminReportRow = {
   id: number;
   reporterId: string;

@@ -9,6 +9,8 @@ import {
   setIdDocumentVerification,
   setProfileVerification,
   setStaffRole,
+  setPremium,
+  grantBonusChatsAdmin,
   type AdminProfileRow,
   type AdminReportRow,
   type StaffRole,
@@ -307,10 +309,33 @@ function ProfileRow({
         )}
         <Button
           size="sm"
+          variant={p.isPremium ? "outline" : "default"}
+          onClick={async () => {
+            await setPremium({ data: { userId: p.userId, isPremium: !p.isPremium } });
+            onChange();
+          }}
+        >
+          {p.isPremium ? "Retirer Prestige" : "Activer Prestige"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={async () => {
+            await grantBonusChatsAdmin({ data: { userId: p.userId, amount: 1 } });
+            onChange();
+          }}
+        >
+          +1 bonus chat
+        </Button>
+        <Button
+          size="sm"
           variant={p.suspended ? "outline" : "destructive"}
           onClick={async () => {
+            const reason = !p.suspended
+              ? window.prompt("Motif de suspension (optionnel) :") ?? undefined
+              : undefined;
             await setProfileSuspended({
-              data: { userId: p.userId, suspended: !p.suspended },
+              data: { userId: p.userId, suspended: !p.suspended, reason },
             });
             onChange();
           }}
@@ -318,17 +343,45 @@ function ProfileRow({
           {p.suspended ? "Réactiver" : "Suspendre"}
         </Button>
         {role === "admin" && (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={async () => {
-              const next = p.role === "moderator" ? "user" : "moderator";
-              await setStaffRole({ data: { userId: p.userId, role: next } });
-              onChange();
-            }}
-          >
-            {p.role === "moderator" ? "Retirer le rôle modérateur" : "Nommer modérateur"}
-          </Button>
+          <>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={async () => {
+                const next = p.role === "moderator" ? "user" : "moderator";
+                await setStaffRole({ data: { userId: p.userId, role: next } });
+                onChange();
+              }}
+            >
+              {p.role === "moderator" ? "Retirer modérateur" : "Nommer modérateur"}
+            </Button>
+            {p.role !== "admin" && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={async () => {
+                  if (!window.confirm(`Nommer ${p.firstName} administrateur ?`)) return;
+                  await setStaffRole({ data: { userId: p.userId, role: "admin" } });
+                  onChange();
+                }}
+              >
+                Nommer admin
+              </Button>
+            )}
+            {p.role === "admin" && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={async () => {
+                  if (!window.confirm(`Retirer le rôle admin de ${p.firstName} ?`)) return;
+                  await setStaffRole({ data: { userId: p.userId, role: "user" } });
+                  onChange();
+                }}
+              >
+                Retirer admin
+              </Button>
+            )}
+          </>
         )}
         <Button
           size="sm"
@@ -343,12 +396,27 @@ function ProfileRow({
               await sendCuratedSuggestion({
                 data: { recipientQuery, suggestedUserId: p.userId, note },
               });
+              window.alert("Suggestion envoyée.");
             } catch (err) {
               window.alert(err instanceof Error ? err.message : "Échec de l'envoi");
             }
           }}
         >
           ✨ Suggérer
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(p.userId);
+              window.alert("user_id copié : " + p.userId);
+            } catch {
+              window.prompt("Copiez le user_id :", p.userId);
+            }
+          }}
+        >
+          Copier ID
         </Button>
       </div>
     </div>
