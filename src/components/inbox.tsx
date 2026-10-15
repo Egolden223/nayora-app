@@ -16,6 +16,7 @@ export { PremiumPanel } from "@/components/premium-panel";
 export function Inbox({
   me,
   matches,
+  activeUniverse,
   selectedId,
   onSelect,
   onRefresh,
@@ -23,6 +24,7 @@ export function Inbox({
 }: {
   me: Profile;
   matches: MatchRow[];
+  activeUniverse?: string;
   selectedId: number | null;
   onSelect: (id: number | null) => void;
   onRefresh: () => void;
@@ -44,6 +46,7 @@ export function Inbox({
     <MatchList
       me={me}
       matches={matches}
+      activeUniverse={activeUniverse}
       onSelect={onSelect}
       onOpenPremium={onOpenPremium}
       onRefresh={onRefresh}
@@ -54,12 +57,14 @@ export function Inbox({
 function MatchList({
   me,
   matches,
+  activeUniverse,
   onSelect,
   onOpenPremium,
   onRefresh,
 }: {
   me: Profile;
   matches: MatchRow[];
+  activeUniverse?: string;
   onSelect: (id: number) => void;
   onOpenPremium: () => void;
   onRefresh?: () => void;
@@ -201,7 +206,14 @@ function MatchList({
       {matches.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
           <p className="font-display text-2xl">{t("noMatches")}</p>
-          <p className="mt-2 text-sm text-muted-foreground">{t("noMatchesLead")}</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {activeUniverse ? t("noMatchesInUniverse") : t("noMatchesLead")}
+          </p>
+          {activeUniverse && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t("activeUniverse")} : {t(activeUniverse)}
+            </p>
+          )}
         </div>
       ) : (
         <div className="flex-1 space-y-1 overflow-y-auto pb-4">
@@ -224,7 +236,7 @@ function MatchList({
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{m.partner.firstName}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {m.lastMessage || t(m.partner.intention)}
+                  {m.lastMessage || t(m.matchUniverse || m.partner.intention)}
                 </p>
               </div>
             </button>
