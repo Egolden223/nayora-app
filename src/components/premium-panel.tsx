@@ -15,7 +15,7 @@ export function PremiumPanel({
   onDone: () => void;
 }) {
   const { t } = useLang();
-  const priceBreakdown = formatPriceBreakdown(me.country);
+  const price = formatPriceBreakdown(me.country);
   const [watching, setWatching] = useState(false);
   const [activating, setActivating] = useState(false);
   const [method, setMethod] = useState<"orange" | "paypal">("orange");
@@ -32,17 +32,31 @@ export function PremiumPanel({
           </li>
         ))}
       </ul>
-      <p className="mt-8 font-display text-4xl tabular-nums">
-        {priceBreakdown.primary}
-        <span className="ml-2 font-sans text-sm text-muted-foreground">{t("perYear")}</span>
-      </p>
-      {priceBreakdown.lines.length > 1 && (
-        <p className="mt-1 text-sm text-muted-foreground tabular-nums">
-          {priceBreakdown.lines.slice(1).join("  ·  ")}
+
+      <div className="mt-8 rounded-2xl border border-primary/25 bg-primary/5 px-5 py-5">
+        <p className="font-display text-4xl tabular-nums tracking-tight text-foreground">
+          {price.primary}
         </p>
-      )}
-      <p className="mt-1 text-xs text-muted-foreground">{t("transparentPricing")}</p>
-      <p className="mt-0.5 text-[11px] text-muted-foreground">{t("priceAlsoIn")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("perYear")}</p>
+        {(price.usd !== price.primary || price.eur !== price.primary) && (
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            {price.usd !== price.primary && (
+              <span className="rounded-full border border-border bg-card px-3 py-1 text-xs tabular-nums text-muted-foreground">
+                {price.usd}
+              </span>
+            )}
+            {price.eur !== price.primary && (
+              <span className="rounded-full border border-border bg-card px-3 py-1 text-xs tabular-nums text-muted-foreground">
+                {price.eur}
+              </span>
+            )}
+          </div>
+        )}
+        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+          {t("transparentPricing")}
+        </p>
+      </div>
+
       {!me.isPremium && (
         <div className="mt-6 text-left">
           <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
