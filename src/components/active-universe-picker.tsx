@@ -4,7 +4,7 @@ import type { Profile } from "@/lib/dating";
 import { setActiveUniverse } from "@/lib/dating";
 import { useLang } from "@/lib/lang";
 
-/** Sélecteur d'univers actif dans le profil (Mes univers). */
+/** Selecteur d'univers actif dans le profil (Mes univers). */
 export function ActiveUniversePicker({
   me,
   onReload,
@@ -20,6 +20,9 @@ export function ActiveUniversePicker({
 
   const activate = async (u: string) => {
     if (u === primary || busy) return;
+    const label = t(u);
+    const msg = t("switchUniverseConfirm").replace("{universe}", label);
+    if (!window.confirm(msg)) return;
     setBusy(true);
     try {
       await setActiveUniverse({ data: { universe: u } });
