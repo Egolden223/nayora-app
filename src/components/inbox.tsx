@@ -72,7 +72,7 @@ function MatchList({
   const loadReceived = useCallback(async () => {
     try {
       const list = await listReceivedLikes();
-      setReceived(list);
+      setReceived(Array.isArray(list) ? list : []);
     } catch {
       setReceived([]);
     }
@@ -146,9 +146,9 @@ function MatchList({
               {c.bio}
             </p>
           )}
-          {c.reasons.length > 0 && (
+          {(c.reasons ?? []).length > 0 && (
             <ul className="w-full space-y-1 text-sm text-muted-foreground">
-              {c.reasons.slice(0, 4).map((r) => (
+              {(c.reasons ?? []).slice(0, 4).map((r) => (
                 <li key={r}>· {t(r)}</li>
               ))}
             </ul>
@@ -220,11 +220,6 @@ function MatchList({
                   className="size-12 rounded-full"
                   textClassName="text-sm"
                 />
-                {m.unread > 0 && (
-                  <span className="absolute -bottom-0.5 -right-0.5 grid size-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                    {m.unread > 9 ? "9+" : m.unread}
-                  </span>
-                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{m.partner.firstName}</p>
