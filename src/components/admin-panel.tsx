@@ -10,6 +10,7 @@ import {
   setProfileVerification,
   setStaffRole,
   setPremium,
+  grantPremiumDays,
   grantBonusChatsAdmin,
   type AdminProfileRow,
   type AdminReportRow,
@@ -315,7 +316,37 @@ function ProfileRow({
             onChange();
           }}
         >
-          {p.isPremium ? "Retirer Prestige" : "Activer Prestige"}
+          {p.isPremium ? "Retirer Prestige" : "Activer Prestige (30 j)"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={async () => {
+            await grantPremiumDays({ data: { userId: p.userId, days: 7 } });
+            onChange();
+          }}
+        >
+          +7 j Prestige
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={async () => {
+            await grantPremiumDays({ data: { userId: p.userId, days: 30 } });
+            onChange();
+          }}
+        >
+          +30 j Prestige
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={async () => {
+            await grantPremiumDays({ data: { userId: p.userId, days: 90 } });
+            onChange();
+          }}
+        >
+          +90 j Prestige
         </Button>
         <Button
           size="sm"
