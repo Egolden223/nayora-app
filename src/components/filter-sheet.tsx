@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   AGE_BANDS,
   COUNTRY_CODES,
@@ -61,50 +62,14 @@ export function FilterSheet({
             />
           )}
           {isLove && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  {t("ageMin")}
-                </p>
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  min={18}
-                  max={99}
-                  placeholder="18"
-                  value={draft.ageMin ?? ""}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setDraft({
-                      ...draft,
-                      ageMin: v === "" ? undefined : Math.min(99, Math.max(18, Number(v) || 18)),
-                      ageBand: "all",
-                    });
-                  }}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  {t("ageMax")}
-                </p>
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  min={18}
-                  max={99}
-                  placeholder="50"
-                  value={draft.ageMax ?? ""}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setDraft({
-                      ...draft,
-                      ageMax: v === "" ? undefined : Math.min(99, Math.max(18, Number(v) || 18)),
-                      ageBand: "all",
-                    });
-                  }}
-                />
-              </div>
-            </div>
+            <AgeRangeFields
+              ageMin={draft.ageMin}
+              ageMax={draft.ageMax}
+              onChange={(ageMin, ageMax) =>
+                setDraft({ ...draft, ageMin, ageMax, ageBand: "all" })
+              }
+              t={t}
+            />
           )}
           {(isFriends || isTravel) && !isLove && (
             <Field
@@ -337,6 +302,80 @@ function Field({
           </option>
         ))}
       </FieldSelect>
+    </div>
+  );
+}
+
+/** Saisie libre de l'age min/max : le clamp 18-99 se fait au blur, pas a chaque frappe. */
+function AgeRangeFields({
+  ageMin,
+  ageMax,
+  onChange,
+  t,
+}: {
+  ageMin?: number;
+  ageMax?: number;
+  onChange: (min: number | undefined, max: number | undefined) => void;
+  t: (k: string) => string;
+}) {
+  const [minStr, setMinStr] = useState(
+    ageMin != null && ageMin > 0 ? String(ageMin) : "",
+  );
+  const [maxStr, setMaxStr] = useState(
+    ageMax != null && ageMax > 0 ? String(ageMax) : "",
+  );
+
+  const clamp = (raw: string): number | undefined => {
+    if (raw.trim() === "") return undefined;
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return undefined;
+    return Math.min(99, Math.max(18, Math.round(n)));
+  };
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          {t("ageMin")}
+        </p>
+        <Input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          placeholder="18"
+          value={minStr}
+          onChange={(e) => {
+            const v = e.target.value.replace(/\D/g, "").slice(0, 2);
+            setMinStr(v);
+          }}
+          onBlur={() => {
+            const c = clamp(minStr);
+            setMinStr(c != null ? String(c) : "");
+            onChange(c, clamp(maxStr));
+          }}
+        />
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          {t("ageMax")}
+        </p>
+        <Input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          placeholder="50"
+          value={maxStr}
+          onChange={(e) => {
+            const v = e.target.value.replace(/\D/g, "").slice(0, 2);
+            setMaxStr(v);
+          }}
+          onBlur={() => {
+            const c = clamp(maxStr);
+            setMaxStr(c != null ? String(c) : "");
+            onChange(clamp(minStr), c);
+          }}
+        />
+      </div>
     </div>
   );
 }
