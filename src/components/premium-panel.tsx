@@ -40,13 +40,10 @@ export function PremiumPanel({
           <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
             <Crown className="size-4" />
             {t("subscribed")}
-            {daysLeft > 0 && (
-              <span className="tabular-nums text-muted-foreground">
-                · {daysLeft} {daysLeft === 1 ? t("dayLeft") : t("daysLeft")}
-              </span>
-            )}
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">{t("premiumActiveLead")}</p>
+          <p className="mt-3 text-sm text-muted-foreground">{t("premiumActiveLead")}</p>
+
+          {/* Avantages débloqués — pas de tarif affiché */}
           <ul className="mt-6 space-y-3 text-left text-sm">
             {benefits.map(({ icon: Icon, text }) => (
               <li
@@ -58,6 +55,19 @@ export function PremiumPanel({
               </li>
             ))}
           </ul>
+
+          {/* Durée restante en bas */}
+          <div className="mt-8 rounded-2xl border border-border bg-card px-5 py-4 text-center">
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {t("premiumRemaining")}
+            </p>
+            <p className="mt-1 font-display text-3xl tabular-nums tracking-tight text-foreground">
+              {daysLeft > 0
+                ? `${daysLeft} ${daysLeft === 1 ? t("dayLeft") : t("daysLeft")}`
+                : t("premiumUnlimited")}
+            </p>
+          </div>
+
           <MatchmakerSection isPremium={me.isPremium} />
         </>
       ) : (
