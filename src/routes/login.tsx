@@ -176,14 +176,14 @@ function Login() {
             <div className="flex gap-2">
               <select
                 id="dial"
-                className="h-10 w-[7.5rem] shrink-0 rounded-md border border-input bg-background px-2 text-sm"
+                className="h-10 max-w-[12rem] shrink-0 rounded-md border border-input bg-background px-2 text-sm"
                 value={dial}
                 onChange={(e) => setDial(e.target.value)}
                 aria-label={t("countryCode")}
               >
                 {DIAL_CODES.map((c) => (
                   <option key={`${c.iso}-${c.dial}`} value={c.dial}>
-                    {c.iso} {c.dial}
+                    {c.dial} {c.label}
                   </option>
                 ))}
               </select>
