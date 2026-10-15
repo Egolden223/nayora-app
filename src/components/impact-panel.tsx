@@ -10,9 +10,9 @@ import { deleteImpactStory, saveImpactStory } from "@/lib/services";
 import { PROJECT_CAUSES } from "@/lib/universe-match";
 
 /** « Mon impact » (Projects & Learn) : 5 pages maximum, visibles sur le profil. */
-export function ImpactSection({ initial }: { initial: ImpactStory[] }) {
+export function ImpactSection({ initial }: { initial?: ImpactStory[] | null }) {
   const { t } = useLang();
-  const [stories, setStories] = useState(initial);
+  const [stories, setStories] = useState<ImpactStory[]>(() => initial ?? []);
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [cause, setCause] = useState("");
@@ -25,7 +25,7 @@ export function ImpactSection({ initial }: { initial: ImpactStory[] }) {
         {t("impactTitle")}
       </h2>
       <p className="mt-1 text-xs text-muted-foreground">{t("impactLead")}</p>
-      {stories.map((s, i) => (
+      {(stories ?? []).map((s, i) => (
         <div key={i} className="mt-3 flex items-start gap-2 rounded-xl bg-background p-3 text-sm">
           <div className="min-w-0 flex-1">
             <p className="font-medium">{s.title}</p>
@@ -36,13 +36,16 @@ export function ImpactSection({ initial }: { initial: ImpactStory[] }) {
             type="button"
             aria-label={t("impactDelete")}
             className="text-muted-foreground"
-            onClick={async () => setStories(await deleteImpactStory({ data: { index: i } }))}
+            onClick={async () => {
+              const next = await deleteImpactStory({ data: { index: i } });
+              setStories(Array.isArray(next) ? next : []);
+            }}
           >
             <Trash2 className="size-4" />
           </button>
         </div>
       ))}
-      {stories.length < 5 ? (
+      {(stories ?? []).length < 5 ? (
         <div className="mt-3 space-y-2">
           <Input value={title} maxLength={80} onChange={(e) => setTitle(e.target.value)} placeholder={t("impactTitleField")} />
           <Textarea rows={2} maxLength={280} value={summary} onChange={(e) => setSummary(e.target.value)} placeholder={t("impactSummary")} />
@@ -61,7 +64,8 @@ export function ImpactSection({ initial }: { initial: ImpactStory[] }) {
             onClick={async () => {
               setBusy(true);
               try {
-                setStories(await saveImpactStory({ data: { title, summary, cause } }));
+                const next = await saveImpactStory({ data: { title, summary, cause } });
+                setStories(Array.isArray(next) ? next : []);
                 setTitle("");
                 setSummary("");
                 setCause("");
