@@ -237,11 +237,7 @@ export const UNIVERSE_FORMS: Record<string, FormSpec> = {
       f("tripDuration", "single", TRIP_DURATIONS, "lbl_tripDuration", "td_"),
       f("passportCountry", "single", "countries", "lbl_passportCountry", "", { hint: "hint_passport" }),
     ],
-    byGoal: {
-      compagnon: [],
-      chercher_guide: [],
-      guide: [],
-    },
+    byGoal: { compagnon: [], chercher_guide: [], guide: [] },
   },
   projets: {
     goal: { field: "projectRole", options: PROJECT_ROLES, prefix: "pr_", label: "lbl_projectRole" },
@@ -254,12 +250,7 @@ export const UNIVERSE_FORMS: Record<string, FormSpec> = {
       f("learnTopics", "multi", "domains", "lbl_learnTopics", "", { max: 4 }),
       f("learnFormat", "single", LEARN_FORMATS, "lbl_learnFormat", "lf_"),
     ],
-    byGoal: {
-      porteur: [],
-      rejoindre: [],
-      transmettre: [],
-      apprendre: [],
-    },
+    byGoal: { porteur: [], rejoindre: [], transmettre: [], apprendre: [] },
   },
 };
 
@@ -281,6 +272,19 @@ export const UNIVERSE_FACETS: Record<
   voyage: { field: "travelGoal", label: "lbl_facet_voyage", options: TRAVEL_GOALS, prefix: "fc_" },
   projets: { field: "projectRole", label: "lbl_facet_projets", options: PROJECT_ROLES, prefix: "fc_" },
 };
+
+export type MatchSubject = {
+  universes: string[];
+  universeData: UniverseData;
+  gender?: string | null;
+  lookingFor?: string | null;
+  ageBand?: string | null;
+  city?: string | null;
+  country?: string | null;
+  birthDate?: string | null;
+};
+
+export type UniverseMatch = { score: number; reasons: string[] };
 
 const uniq = (arr: string[]) => Array.from(new Set(arr));
 const inter = (a: string[] = [], b: string[] = []) => a.filter((x) => b.includes(x));
@@ -342,87 +346,129 @@ export function parseUniverseData(raw: unknown): UniverseData {
   return sanitizeUniverseData(raw, { domains: [], countries: [] });
 }
 
-export type UniverseMatch = { score: number; reasons: string[]; universe: string };
-
-export function scoreUniversePair(
-  meU: string,
-  themU: string,
-  me: UniverseData,
-  them: UniverseData,
-): UniverseMatch | null {
-  if (meU !== themU) return null;
+export function scoreUniverse(universe: string, me: MatchSubject, them: MatchSubject): UniverseMatch {
+  const a = me.universeData ?? {};
+  const b = them.universeData ?? {};
   const reasons: string[] = [];
   let score = 40;
-  if (meU === "professionnel") {
-    const a = me.proGoal;
-    const b = them.proGoal;
-    if (a && b) {
-      const comp = PRO_GOAL_COMPLEMENT[a];
-      if (comp === b) {
+  if (universe === "professionnel") {
+    if (a.proGoal && b.proGoal) {
+      const comp = PRO_GOAL_COMPLEMENT[a.proGoal];
+      if (comp === b.proGoal) {
         score += 25;
         reasons.push("r_proGoal");
-      } else if (a === b) {
+      } else if (a.proGoal === b.proGoal) {
         score += 10;
         reasons.push("r_proGoalSame");
       }
-      if (comp && (a === "recrute" || a === "emploi") && inter(me.contractTypes, them.contractTypes).length) {
+      if (comp && (a.proGoal === "recrute" || a.proGoal === "emploi") && inter(a.contractTypes, b.contractTypes).length) {
         score += 8;
         reasons.push("r_contract");
       }
     }
-    if (inter(me.focusDomains, them.focusDomains).length) {
+    if (inter(a.focusDomains, b.focusDomains).length) {
       score += 12;
       reasons.push("r_domain");
     }
-  } else if (meU === "amitie") {
-    const shared = inter(me.interests, them.interests);
+  } else if (universe === "amitie") {
+    const shared = inter(a.interests, b.interests);
     if (shared.length) {
       score += Math.min(20, shared.length * 5);
       reasons.push("r_interests");
     }
-    if (me.socialVibe && me.socialVibe === them.socialVibe) {
+    if (a.socialVibe && a.socialVibe === b.socialVibe) {
       score += 8;
       reasons.push("r_vibe");
     }
-  } else if (meU === "voyage") {
-    if (me.travelGoal && them.travelGoal) {
+  } else if (universe === "voyage") {
+    if (a.travelGoal && b.travelGoal) {
       if (
-        (me.travelGoal === "compagnon" && them.travelGoal === "compagnon") ||
-        (me.travelGoal === "guide" && them.travelGoal === "chercher_guide") ||
-        (me.travelGoal === "chercher_guide" && them.travelGoal === "guide")
+        (a.travelGoal === "compagnon" && b.travelGoal === "compagnon") ||
+        (a.travelGoal === "guide" && b.travelGoal === "chercher_guide") ||
+        (a.travelGoal === "chercher_guide" && b.travelGoal === "guide")
       ) {
         score += 20;
         reasons.push("r_travelGoal");
       }
     }
-    if (inter(me.travelStyles, them.travelStyles).length) {
+    if (inter(a.travelStyles, b.travelStyles).length) {
       score += 10;
       reasons.push("r_travelStyle");
     }
-    if (inter(me.destinationCountries, them.destinationCountries).length) {
+    if (inter(a.destinationCountries, b.destinationCountries).length) {
       score += 10;
       reasons.push("r_destination");
     }
-  } else if (meU === "projets") {
-    const role = me.projectRole && them.projectRole ? PROJECT_ROLE_COMPLEMENT[me.projectRole] : null;
-    if (role && them.projectRole) {
-      if (role.best.includes(them.projectRole)) score += 20;
-      else if (role.partial.includes(them.projectRole)) score += 10;
+  } else if (universe === "projets") {
+    const role = a.projectRole && b.projectRole ? PROJECT_ROLE_COMPLEMENT[a.projectRole] : null;
+    if (role && b.projectRole) {
+      if (role.best.includes(b.projectRole)) score += 20;
+      else if (role.partial.includes(b.projectRole)) score += 10;
     }
-    if (inter(me.projectCauses, them.projectCauses).length) {
+    if (inter(a.projectCauses, b.projectCauses).length) {
       score += 12;
       reasons.push("r_cause");
     }
-  } else if (meU === "mariage") {
-    score += 5;
-    if (me.loveGoal && them.loveGoal && me.loveGoal === them.loveGoal) {
-      score += 10;
-      reasons.push("r_loveGoal");
-    }
-    if (inter(me.values, them.values).length) {
-      score += 10;
-      reasons.push("r_values");
-    }
+  } else if (universe === "mariage") {
+    return loveReasons(me, them);
   }
-  return { score: Math.min(98, score), reasons, universe: meU };
+  return { score: Math.min(98, Math.max(0, score)), reasons: reasons.slice(0, 6) };
+}
+
+export function loveDealbreaker(me: MatchSubject, them: MatchSubject): boolean {
+  const a = me.universeData ?? {};
+  const b = them.universeData ?? {};
+  if (a.religionImportance === "essentiel" && a.religion && b.religion && a.religion !== b.religion) return true;
+  if (a.polygamy === "non" && b.polygamy === "oui") return true;
+  if (a.wantsChildren === "no" && b.wantsChildren === "yes") return true;
+  return false;
+}
+
+export function diasporaBonus(me: MatchSubject, them: MatchSubject): { score: number; reasons: string[] } {
+  const a = me.universeData ?? {};
+  const b = them.universeData ?? {};
+  const reasons: string[] = [];
+  let bonus = 0;
+  if (a.originCountry && a.originCountry === b.originCountry) {
+    bonus += 6;
+    reasons.push("r_origin");
+  }
+  if (a.openToDiaspora === "oui" || b.openToDiaspora === "oui") {
+    bonus += 4;
+    reasons.push("r_diaspora");
+  }
+  return { score: Math.max(0, Math.min(100, bonus)), reasons: reasons.slice(0, 5) };
+}
+
+export function travelIncompatible(me: MatchSubject, them: MatchSubject): boolean {
+  const a = me.universeData ?? {};
+  const b = them.universeData ?? {};
+  if (a.companionGender === "femmes" && them.gender === "homme") return true;
+  if (b.companionGender === "femmes" && me.gender === "homme") return true;
+  return false;
+}
+
+export function loveReasons(me: MatchSubject, them: MatchSubject): UniverseMatch {
+  const a = me.universeData ?? {};
+  const b = them.universeData ?? {};
+  const reasons: string[] = [];
+  let score = 45;
+  if (a.loveGoal && b.loveGoal && a.loveGoal === b.loveGoal) {
+    score += 12;
+    reasons.push("r_loveGoal");
+  }
+  const sharedVal = inter(a.values, b.values);
+  if (sharedVal.length) {
+    score += Math.min(16, sharedVal.length * 4);
+    reasons.push("r_values");
+  }
+  if (a.religion && b.religion && a.religion === b.religion) {
+    score += 10;
+    reasons.push("r_religion");
+  }
+  if (a.faithPractice && a.faithPractice === b.faithPractice) {
+    score += 6;
+    reasons.push("r_faith");
+  }
+  return { score: Math.min(98, Math.max(0, score)), reasons: reasons.slice(0, 6) };
 }
