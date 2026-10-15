@@ -1,6 +1,13 @@
 /** Indicatifs téléphoniques mondiaux (ISO 3166-1 alpha-2 → E.164). */
 export type DialCode = { iso: string; dial: string; label: string };
 
+/** Drapeau emoji depuis le code ISO (ex. CI → 🇨🇮). */
+export function flagEmoji(iso: string): string {
+  const code = (iso || "").toUpperCase();
+  if (code.length !== 2) return "";
+  return String.fromCodePoint(...[...code].map((c) => 127397 + c.charCodeAt(0)));
+}
+
 /** Liste complète ~226 pays & territoires — triée alphabétiquement (FR). */
 export const DIAL_CODES: DialCode[] = [
   { iso: "AF", dial: "+93", label: "Afghanistan" },
@@ -48,13 +55,11 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "KM", dial: "+269", label: "Comores" },
   { iso: "CG", dial: "+242", label: "Congo" },
   { iso: "CD", dial: "+243", label: "Congo (RDC)" },
-  { iso: "KP", dial: "+850", label: "Corée du Nord" },
   { iso: "KR", dial: "+82", label: "Corée du Sud" },
   { iso: "CR", dial: "+506", label: "Costa Rica" },
   { iso: "CI", dial: "+225", label: "Côte d'Ivoire" },
   { iso: "HR", dial: "+385", label: "Croatie" },
   { iso: "CU", dial: "+53", label: "Cuba" },
-  { iso: "CW", dial: "+599", label: "Curaçao" },
   { iso: "DK", dial: "+45", label: "Danemark" },
   { iso: "DJ", dial: "+253", label: "Djibouti" },
   { iso: "DM", dial: "+1767", label: "Dominique" },
@@ -76,27 +81,18 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "GH", dial: "+233", label: "Ghana" },
   { iso: "GI", dial: "+350", label: "Gibraltar" },
   { iso: "GR", dial: "+30", label: "Grèce" },
-  { iso: "GD", dial: "+1473", label: "Grenade" },
   { iso: "GL", dial: "+299", label: "Groenland" },
   { iso: "GP", dial: "+590", label: "Guadeloupe" },
-  { iso: "GU", dial: "+1671", label: "Guam" },
   { iso: "GT", dial: "+502", label: "Guatemala" },
   { iso: "GN", dial: "+224", label: "Guinée" },
   { iso: "GQ", dial: "+240", label: "Guinée équatoriale" },
   { iso: "GW", dial: "+245", label: "Guinée-Bissau" },
   { iso: "GY", dial: "+592", label: "Guyana" },
-  { iso: "GF", dial: "+594", label: "Guyane française" },
+  { iso: "GF", dial: "+594", label: "Guyane" },
   { iso: "HT", dial: "+509", label: "Haïti" },
   { iso: "HN", dial: "+504", label: "Honduras" },
   { iso: "HK", dial: "+852", label: "Hong Kong" },
   { iso: "HU", dial: "+36", label: "Hongrie" },
-  { iso: "CK", dial: "+682", label: "Îles Cook" },
-  { iso: "FO", dial: "+298", label: "Îles Féroé" },
-  { iso: "MH", dial: "+692", label: "Îles Marshall" },
-  { iso: "SB", dial: "+677", label: "Îles Salomon" },
-  { iso: "TC", dial: "+1649", label: "Îles Turques-et-Caïques" },
-  { iso: "VG", dial: "+1284", label: "Îles Vierges britanniques" },
-  { iso: "VI", dial: "+1340", label: "Îles Vierges des États-Unis" },
   { iso: "IN", dial: "+91", label: "Inde" },
   { iso: "ID", dial: "+62", label: "Indonésie" },
   { iso: "IQ", dial: "+964", label: "Irak" },
@@ -111,8 +107,6 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "KZ", dial: "+7", label: "Kazakhstan" },
   { iso: "KE", dial: "+254", label: "Kenya" },
   { iso: "KG", dial: "+996", label: "Kirghizistan" },
-  { iso: "KI", dial: "+686", label: "Kiribati" },
-  { iso: "XK", dial: "+383", label: "Kosovo" },
   { iso: "KW", dial: "+965", label: "Koweït" },
   { iso: "LA", dial: "+856", label: "Laos" },
   { iso: "LS", dial: "+266", label: "Lesotho" },
@@ -137,21 +131,17 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "MR", dial: "+222", label: "Mauritanie" },
   { iso: "YT", dial: "+262", label: "Mayotte" },
   { iso: "MX", dial: "+52", label: "Mexique" },
-  { iso: "FM", dial: "+691", label: "Micronésie" },
   { iso: "MD", dial: "+373", label: "Moldavie" },
   { iso: "MC", dial: "+377", label: "Monaco" },
   { iso: "MN", dial: "+976", label: "Mongolie" },
   { iso: "ME", dial: "+382", label: "Monténégro" },
-  { iso: "MS", dial: "+1664", label: "Montserrat" },
   { iso: "MZ", dial: "+258", label: "Mozambique" },
   { iso: "MM", dial: "+95", label: "Myanmar" },
   { iso: "NA", dial: "+264", label: "Namibie" },
-  { iso: "NR", dial: "+674", label: "Nauru" },
   { iso: "NP", dial: "+977", label: "Népal" },
   { iso: "NI", dial: "+505", label: "Nicaragua" },
   { iso: "NE", dial: "+227", label: "Niger" },
   { iso: "NG", dial: "+234", label: "Nigeria" },
-  { iso: "NU", dial: "+683", label: "Niue" },
   { iso: "NO", dial: "+47", label: "Norvège" },
   { iso: "NC", dial: "+687", label: "Nouvelle-Calédonie" },
   { iso: "NZ", dial: "+64", label: "Nouvelle-Zélande" },
@@ -159,8 +149,6 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "UG", dial: "+256", label: "Ouganda" },
   { iso: "UZ", dial: "+998", label: "Ouzbékistan" },
   { iso: "PK", dial: "+92", label: "Pakistan" },
-  { iso: "PW", dial: "+680", label: "Palaos" },
-  { iso: "PS", dial: "+970", label: "Palestine" },
   { iso: "PA", dial: "+507", label: "Panama" },
   { iso: "PG", dial: "+675", label: "Papouasie-Nouvelle-Guinée" },
   { iso: "PY", dial: "+595", label: "Paraguay" },
@@ -169,28 +157,16 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "PH", dial: "+63", label: "Philippines" },
   { iso: "PL", dial: "+48", label: "Pologne" },
   { iso: "PF", dial: "+689", label: "Polynésie française" },
-  { iso: "PR", dial: "+1787", label: "Porto Rico" },
   { iso: "PT", dial: "+351", label: "Portugal" },
   { iso: "QA", dial: "+974", label: "Qatar" },
-  { iso: "RE", dial: "+262", label: "La Réunion" },
+  { iso: "CF", dial: "+236", label: "République centrafricaine" },
+  { iso: "DO", dial: "+1809", label: "République dominicaine" },
+  { iso: "CZ", dial: "+420", label: "République tchèque" },
+  { iso: "RE", dial: "+262", label: "Réunion" },
   { iso: "RO", dial: "+40", label: "Roumanie" },
   { iso: "GB", dial: "+44", label: "Royaume-Uni" },
   { iso: "RU", dial: "+7", label: "Russie" },
   { iso: "RW", dial: "+250", label: "Rwanda" },
-  { iso: "EH", dial: "+212", label: "Sahara occidental" },
-  { iso: "BL", dial: "+590", label: "Saint-Barthélemy" },
-  { iso: "KN", dial: "+1869", label: "Saint-Kitts-et-Nevis" },
-  { iso: "SM", dial: "+378", label: "Saint-Marin" },
-  { iso: "MF", dial: "+590", label: "Saint-Martin" },
-  { iso: "SX", dial: "+1721", label: "Sint Maarten" },
-  { iso: "PM", dial: "+508", label: "Saint-Pierre-et-Miquelon" },
-  { iso: "VC", dial: "+1784", label: "Saint-Vincent-et-les-Grenadines" },
-  { iso: "SH", dial: "+290", label: "Sainte-Hélène" },
-  { iso: "LC", dial: "+1758", label: "Sainte-Lucie" },
-  { iso: "SV", dial: "+503", label: "Salvador" },
-  { iso: "WS", dial: "+685", label: "Samoa" },
-  { iso: "AS", dial: "+1684", label: "Samoa américaines" },
-  { iso: "ST", dial: "+239", label: "Sao Tomé-et-Principe" },
   { iso: "SN", dial: "+221", label: "Sénégal" },
   { iso: "RS", dial: "+381", label: "Serbie" },
   { iso: "SC", dial: "+248", label: "Seychelles" },
@@ -207,10 +183,8 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "SR", dial: "+597", label: "Suriname" },
   { iso: "SY", dial: "+963", label: "Syrie" },
   { iso: "TJ", dial: "+992", label: "Tadjikistan" },
-  { iso: "TW", dial: "+886", label: "Taïwan" },
   { iso: "TZ", dial: "+255", label: "Tanzanie" },
   { iso: "TD", dial: "+235", label: "Tchad" },
-  { iso: "CZ", dial: "+420", label: "Tchéquie" },
   { iso: "TH", dial: "+66", label: "Thaïlande" },
   { iso: "TL", dial: "+670", label: "Timor oriental" },
   { iso: "TG", dial: "+228", label: "Togo" },
@@ -219,11 +193,9 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "TN", dial: "+216", label: "Tunisie" },
   { iso: "TM", dial: "+993", label: "Turkménistan" },
   { iso: "TR", dial: "+90", label: "Turquie" },
-  { iso: "TV", dial: "+688", label: "Tuvalu" },
   { iso: "UA", dial: "+380", label: "Ukraine" },
   { iso: "UY", dial: "+598", label: "Uruguay" },
   { iso: "VU", dial: "+678", label: "Vanuatu" },
-  { iso: "VA", dial: "+379", label: "Vatican" },
   { iso: "VE", dial: "+58", label: "Venezuela" },
   { iso: "VN", dial: "+84", label: "Viêt Nam" },
   { iso: "YE", dial: "+967", label: "Yémen" },
@@ -231,25 +203,17 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "ZW", dial: "+263", label: "Zimbabwe" },
 ];
 
-const PHONE_EMAIL_DOMAIN = "phone.nayora.app";
+export const PENDING_PHONE_KEY = "nayora_pending_phone";
 
 export function toE164(dial: string, national: string): string | null {
-  const d = dial.replace(/[^\d+]/g, "");
-  let n = national.replace(/[^\d]/g, "");
-  if (n.startsWith("0")) n = n.slice(1);
-  if (n.length < 6 || n.length > 15) return null;
-  const full = `${d.startsWith("+") ? d : `+${d}`}${n}`;
-  if (!/^\+\d{8,16}$/.test(full)) return null;
-  return full;
+  const d = (dial || "").trim();
+  const n = (national || "").replace(/\D/g, "");
+  if (!d.startsWith("+") || n.length < 4) return null;
+  return `${d}${n}`;
 }
 
+/** E-mail synthétique pour Better Auth (pas d'SMS). */
 export function phoneToAuthEmail(e164: string): string {
   const digits = e164.replace(/\D/g, "");
-  return `${digits}@${PHONE_EMAIL_DOMAIN}`;
+  return `phone.${digits}@phone.nayora.app`;
 }
-
-export function isPhoneAuthEmail(email: string): boolean {
-  return email.toLowerCase().endsWith(`@${PHONE_EMAIL_DOMAIN}`);
-}
-
-export const PENDING_PHONE_KEY = "nayora_pending_phone";
