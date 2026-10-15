@@ -1,20 +1,9 @@
 /**
  * Intelligence des univers NAYORA — logique pure (sans dépendance), testée par
  * `scripts/universe-match.test.mjs`.
- *
- * Chaque univers a son propre formulaire, ADAPTATIF : la première question
- * (« que cherchez-vous ? ») détermine les questions suivantes (UNIVERSE_FORMS).
- * Le même schéma sert à rendre le formulaire, nettoyer les données côté
- * serveur et calculer l'appariement :
- *  - Love     : affinités profondes et respect (valeurs, langage de l'amour, horizon de vie)
- *  - Friends  : élargir son cercle, intégration communautaire (intérêts, communauté, disponibilités)
- *  - Pro      : réseau d'affaires, associés, mentorat, recrutement (objectifs COMPLÉMENTAIRES)
- *  - Travel   : compagnons de voyage et guides locaux (styles, destinations, période, budget)
- *  - Projects : collaboration sur projets à impact, partage de savoirs (rôles et compétences complémentaires)
  */
 
 export const PRO_GOALS = ["associe", "mentor_cherche", "mentor_offre", "recrute", "emploi", "affaires"] as const;
-/** Chaque objectif pro cherche son complément : mentor↔mentoré, recruteur↔candidat… */
 export const PRO_GOAL_COMPLEMENT: Record<string, string> = {
   associe: "associe",
   mentor_cherche: "mentor_offre",
@@ -39,7 +28,6 @@ export const TRAVEL_BUDGETS = ["eco", "confort", "premium"] as const;
 export const YES_NO = ["oui", "non"] as const;
 
 export const PROJECT_ROLES = ["porteur", "rejoindre", "transmettre", "apprendre"] as const;
-/** Rôle complémentaire parfait (best) et partiel. */
 export const PROJECT_ROLE_COMPLEMENT: Record<string, { best: string[]; partial: string[] }> = {
   porteur: { best: ["rejoindre"], partial: ["transmettre", "apprendre"] },
   rejoindre: { best: ["porteur"], partial: [] },
@@ -332,6 +320,7 @@ export type MatchSubject = {
 export type UniverseMatch = { score: number; reasons: string[] };
 
 const uniq = (arr: string[]) => Array.from(new Set(arr));
+const inter = (a: string[] = [], b: string[] = []) => a.filter((x) => b.includes(x));
 
 export function cleanText(v: unknown, max: number): string {
   if (typeof v !== "string") return "";
@@ -391,8 +380,110 @@ export function parseUniverseData(raw: unknown): UniverseData {
 }
 
 export function scoreUniverse(universe: string, me: MatchSubject, them: MatchSubject): UniverseMatch {
-  if (universe === "mariage") return loveReasons(me, them);
-  return { score: 50, reasons: [] };
+  const reasons: string[] = [];
+  let score = 40;
+  const a = me.universeData ?? {};
+  const b = them.universeData ?? {};
+
+  switch (universe) {
+    case "professionnel": {
+      const comp = Boolean(a.proGoal && b.proGoal && PRO_GOAL_COMPLEMENT[a.proGoal] === b.proGoal);
+      if (comp) {
+        score += 30;
+        reasons.push("r_complement");
+      }
+      const dom = inter(a.focusDomains, b.focusDomains);
+      if (dom.length) {
+        score += (comp ? 14 : 6) + (dom.length > 1 && comp ? 4 : 0);
+        reasons.push("r_sameDomain");
+      } else if (!a.focusDomains?.length && !b.focusDomains?.length && me.proDomain && me.proDomain === them.proDomain) {
+        score += 8;
+        reasons.push("r_sameDomain");
+      }
+      if (comp && (a.proGoal === "recrute" || a.proGoal === "emploi") && inter(a.contractTypes, b.contractTypes).length) {
+        score += 8;
+        reasons.push("r_contract");
+      }
+      if (comp && a.proGoal === "associe" && a.proStage && a.proStage === b.proStage) {
+        score += 6;
+        reasons.push("r_sameStage");
+      }
+      if (comp && a.proGoal === "affaires" && a.bizSide && BIZ_COMPLEMENT[a.bizSide] === b.bizSide) score += 10;
+      if (inter(a.meetFormat, b.meetFormat).length) {
+        score += 4;
+        reasons.push("r_meet");
+      }
+      break;
+    }
+    case "amitie": {
+      if (a.friendGoal && b.friendGoal && a.friendGoal === b.friendGoal) {
+        score += 12;
+        reasons.push("r_goal");
+      }
+      const ints = inter(a.interests, b.interests);
+      if (ints.length) {
+        score += 8 + ints.length * 3;
+        reasons.push("r_interests");
+      }
+      if (a.communityType && a.communityType === b.communityType) {
+        score += 10;
+        reasons.push("r_community");
+      }
+      if (a.socialVibe && a.socialVibe === b.socialVibe) score += 5;
+      break;
+    }
+    case "voyage": {
+      if (travelIncompatible(me, them)) return { score: 0, reasons: ["r_hard_block"] };
+      if (a.travelGoal && b.travelGoal) {
+        if (
+          (a.travelGoal === "compagnon" && b.travelGoal === "compagnon") ||
+          (a.travelGoal === "chercher_guide" && b.travelGoal === "guide") ||
+          (a.travelGoal === "guide" && b.travelGoal === "chercher_guide")
+        ) {
+          score += 20;
+          reasons.push("r_complement");
+        }
+      }
+      const dest = inter(a.travelDestinations, b.travelDestinations);
+      if (dest.length) {
+        score += 12 + dest.length * 4;
+        reasons.push("r_dest");
+      }
+      const styles = inter(a.travelStyles, b.travelStyles);
+      if (styles.length) {
+        score += 6 + styles.length * 2;
+        reasons.push("r_style");
+      }
+      break;
+    }
+    case "projets": {
+      const roles = a.projectRole && b.projectRole ? PROJECT_ROLE_COMPLEMENT[a.projectRole] : null;
+      if (roles) {
+        if (roles.best.includes(b.projectRole!)) {
+          score += 28;
+          reasons.push("r_complement");
+        } else if (roles.partial.includes(b.projectRole!)) {
+          score += 12;
+          reasons.push("r_partial");
+        }
+      }
+      if (a.projectDomain && a.projectDomain === b.projectDomain) {
+        score += 10;
+        reasons.push("r_sameDomain");
+      }
+      const offerWant = inter(a.skillsOffer, b.skillsWant).length + inter(b.skillsOffer, a.skillsWant).length;
+      if (offerWant) {
+        score += 8 + offerWant * 3;
+        reasons.push("r_skills");
+      }
+      break;
+    }
+    case "mariage":
+      return loveReasons(me, them);
+    default:
+      break;
+  }
+  return { score: Math.max(0, Math.min(100, score)), reasons: reasons.slice(0, 5) };
 }
 
 export function loveDealbreaker(me: MatchSubject, them: MatchSubject): boolean {
@@ -410,7 +501,7 @@ export function diasporaBonus(me: MatchSubject, them: MatchSubject): { score: nu
   const b = them.universeData ?? {};
   const reasons: string[] = [];
   let score = 0;
-  if (a.originCountry && b.country && a.originCountry === b.country) {
+  if (a.originCountry && them.country && a.originCountry === them.country) {
     score += 8;
     reasons.push("r_origin");
   }
@@ -423,6 +514,15 @@ export function diasporaBonus(me: MatchSubject, them: MatchSubject): { score: nu
 
 export function travelIncompatible(me: MatchSubject, them: MatchSubject): boolean {
   return false;
+}
+
+function bandFits(min: number | undefined, max: number | undefined, band: string): boolean {
+  const m = band.match(/(\d+)/);
+  if (!m) return true;
+  const age = Number(m[1]);
+  if (min !== undefined && age < min) return false;
+  if (max !== undefined && age > max) return false;
+  return true;
 }
 
 export function loveReasons(me: MatchSubject, them: MatchSubject): UniverseMatch {
@@ -438,25 +538,37 @@ export function loveReasons(me: MatchSubject, them: MatchSubject): UniverseMatch
   if (a.religion && b.religion && a.religion === b.religion) {
     bonus += 10;
     reasons.push("r_religion");
+  } else if (a.religion && b.religion && CHRISTIAN.includes(a.religion) && CHRISTIAN.includes(b.religion)) {
+    bonus += 4;
   }
   if (a.polygamy === "non" && b.polygamy === "non") {
     bonus += 4;
     reasons.push("r_poly_align");
   }
-  if (a.wantsChildren && b.wantsChildren && a.wantsChildren === b.wantsChildren) {
-    bonus += 6;
-    reasons.push("r_kids_plan");
+  if (a.wantsChildren && b.wantsChildren) {
+    if ((a.wantsChildren === "yes" && b.wantsChildren === "no") || (a.wantsChildren === "no" && b.wantsChildren === "yes"))
+      bonus -= 15;
+    else if (a.wantsChildren === b.wantsChildren) {
+      bonus += 6;
+      reasons.push("r_kids_plan");
+    }
   }
-  const inter = (x?: string[], y?: string[]) => {
-    if (!x?.length || !y?.length) return 0;
-    const s = new Set(y);
-    return x.filter((v) => s.has(v)).length;
-  };
-  const vals = inter(a.partnerValues, b.values) + inter(b.partnerValues, a.values);
+  const vals = inter(a.partnerValues, b.values).length + inter(b.partnerValues, a.values).length;
   if (vals > 0) {
     bonus += Math.min(12, vals * 3);
     reasons.push("r_values");
   }
+  if (me.loveLanguage && them.loveLanguage && me.loveLanguage === them.loveLanguage) {
+    bonus += 5;
+    reasons.push("r_love_lang");
+  }
+  if (a.partnerAgeMin !== undefined || a.partnerAgeMax !== undefined) {
+    if (bandFits(a.partnerAgeMin, a.partnerAgeMax, them.ageBand)) {
+      bonus += 4;
+    } else bonus -= 10;
+  }
+  if ((b.partnerAgeMin !== undefined || b.partnerAgeMax !== undefined) && !bandFits(b.partnerAgeMin, b.partnerAgeMax, me.ageBand))
+    bonus -= 8;
   const dia = diasporaBonus(me, them);
   bonus += dia.score;
   reasons.push(...dia.reasons);
