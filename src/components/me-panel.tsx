@@ -237,7 +237,7 @@ export function MePanel({
           </label>
         </div>
 
-        <ImpactSection me={me} onReload={onReload} />
+        <ImpactSection initial={me.impactStories ?? []} />
 
         <Button
           size="sm"
