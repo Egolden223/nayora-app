@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitch } from "@/components/language-switch";
 import { ProfilePhoto } from "@/components/profile-photo";
+import { ActiveUniversePicker } from "@/components/active-universe-picker";
 
 export function MePanel({
   me,
@@ -173,6 +174,8 @@ export function MePanel({
             </Badge>
           )}
         </div>
+
+        <ActiveUniversePicker me={me} onReload={onReload} />
 
         <div className="mt-3 w-full max-w-sm">
           <UniverseFacts universe={primaryUniverse} data={me.universeData} />
