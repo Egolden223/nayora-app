@@ -3,6 +3,11 @@ import type { Lang } from "@/lib/i18n";
 
 const EXTRA: Record<Lang, Record<string, string>> = {
   fr: {
+    authPhone: "Téléphone",
+    countryCode: "Indicatif",
+    phonePlaceholder: "07 00 00 00 00",
+    phoneAuthHint: "Indicatif pays + numéro. Même mot de passe pour te reconnecter.",
+    invalidPhone: "Numéro invalide. Vérifie l'indicatif et le numéro.",
     sendPhoto: "Envoyer une photo",
     requestCallAudio: "Appel audio",
     requestCallVideo: "Appel vidéo",
@@ -19,6 +24,11 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     optional: "facultatif",
   },
   en: {
+    authPhone: "Phone",
+    countryCode: "Country code",
+    phonePlaceholder: "700000000",
+    phoneAuthHint: "Country code + number. Same password to sign back in.",
+    invalidPhone: "Invalid number. Check the country code and digits.",
     sendPhoto: "Send a photo",
     requestCallAudio: "Audio call",
     requestCallVideo: "Video call",
@@ -35,6 +45,11 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     optional: "optional",
   },
   ar: {
+    authPhone: "الهاتف",
+    countryCode: "رمز البلد",
+    phonePlaceholder: "700000000",
+    phoneAuthHint: "رمز البلد + الرقم. نفس كلمة المرور لتسجيل الدخول لاحقًا.",
+    invalidPhone: "رقم غير صالح. تحقق من الرمز والأرقام.",
     sendPhoto: "إرسال صورة",
     requestCallAudio: "مكالمة صوتية",
     requestCallVideo: "مكالمة فيديو",
@@ -51,6 +66,11 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     optional: "اختياري",
   },
   es: {
+    authPhone: "Teléfono",
+    countryCode: "Indicativo",
+    phonePlaceholder: "600000000",
+    phoneAuthHint: "Indicativo + número. Misma contraseña para volver a entrar.",
+    invalidPhone: "Número no válido. Revisa el indicativo y los dígitos.",
     sendPhoto: "Enviar una foto",
     requestCallAudio: "Llamada de audio",
     requestCallVideo: "Videollamada",
@@ -67,6 +87,11 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     optional: "opcional",
   },
   pt: {
+    authPhone: "Telefone",
+    countryCode: "Indicativo",
+    phonePlaceholder: "900000000",
+    phoneAuthHint: "Indicativo + número. Mesma palavra-passe para voltar a entrar.",
+    invalidPhone: "Número inválido. Verifica o indicativo e os dígitos.",
     sendPhoto: "Enviar uma foto",
     requestCallAudio: "Chamada de áudio",
     requestCallVideo: "Videochamada",
