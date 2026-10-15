@@ -80,26 +80,11 @@ export function FilterSheet({
             />
           )}
           {isLove && (
-            <div className="space-y-1.5">
-              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                {t("heightMin")}
-              </p>
-              <Input
-                type="number"
-                inputMode="numeric"
-                min={140}
-                max={220}
-                placeholder="cm"
-                value={draft.heightMin ?? ""}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setDraft({
-                    ...draft,
-                    heightMin: v === "" ? undefined : Math.min(220, Math.max(140, Number(v) || 140)),
-                  });
-                }}
-              />
-            </div>
+            <HeightMinField
+              heightMin={draft.heightMin}
+              onChange={(heightMin) => setDraft({ ...draft, heightMin })}
+              t={t}
+            />
           )}
           {isLove && (
             <div className="space-y-1.5">
@@ -376,6 +361,52 @@ function AgeRangeFields({
           }}
         />
       </div>
+    </div>
+  );
+}
+
+/** Saisie libre de la taille min : clamp 140-220 au blur uniquement. */
+function HeightMinField({
+  heightMin,
+  onChange,
+  t,
+}: {
+  heightMin?: number;
+  onChange: (v: number | undefined) => void;
+  t: (k: string) => string;
+}) {
+  const [str, setStr] = useState(
+    heightMin != null && heightMin > 0 ? String(heightMin) : "",
+  );
+
+  const clamp = (raw: string): number | undefined => {
+    if (raw.trim() === "") return undefined;
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return undefined;
+    return Math.min(220, Math.max(140, Math.round(n)));
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        {t("heightMin")}
+      </p>
+      <Input
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        placeholder="cm"
+        value={str}
+        onChange={(e) => {
+          const v = e.target.value.replace(/\D/g, "").slice(0, 3);
+          setStr(v);
+        }}
+        onBlur={() => {
+          const c = clamp(str);
+          setStr(c != null ? String(c) : "");
+          onChange(c);
+        }}
+      />
     </div>
   );
 }
