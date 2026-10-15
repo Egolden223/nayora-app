@@ -158,8 +158,7 @@ export function MePanel({
         )}
 
         <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-          <Badge tone="primary">{t(primaryUniverse)}</Badge>
-          {primaryUniverse === "mariage" && <Badge>{t(me.familyStatus)}</Badge>}
+          {me.familyStatus ? <Badge>{t(me.familyStatus)}</Badge> : null}
           {me.verificationStatus === "verifie" && (
             <Badge tone="ok">
               <ShieldCheck className="mr-1 size-3" />
@@ -186,11 +185,6 @@ export function MePanel({
             <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               {t("universeSubProfile")}
             </p>
-            <div className="flex flex-wrap justify-center gap-1.5">
-              {otherUniverses.map((u) => (
-                <Badge key={u}>{t(u)}</Badge>
-              ))}
-            </div>
             {otherUniverses.map((u) => (
               <div key={`facts-${u}`} className="flex flex-col items-center">
                 <UniverseFacts universe={u} data={me.universeData} />
