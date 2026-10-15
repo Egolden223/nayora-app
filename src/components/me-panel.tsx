@@ -1,7 +1,7 @@
 import { ImpactSection } from "@/components/impact-panel";
 import { UniverseFacts } from "@/components/universe-form";
 import { useEffect, useRef, useState } from "react";
-import { ShieldAlert, ShieldCheck, Sparkles } from "lucide-react";
+import { Camera, Crown, ShieldAlert, ShieldCheck, Sparkles } from "lucide-react";
 import type { Profile } from "@/lib/dating";
 import { getMyStaffRole } from "@/lib/admin";
 import {
@@ -10,11 +10,12 @@ import {
   setFeaturedOk,
   submitIdDocument,
   submitSelfie,
+  upsertProfile,
 } from "@/lib/dating";
 import { countryName, languageName } from "@/lib/i18n";
 import { useLang } from "@/lib/lang";
 import { UserButton } from "@/lib/auth/gates";
-import { fileToResizedDataUrl } from "@/lib/image-resize";
+import { fileToResizedDataUrl, makeBlurDataUrl } from "@/lib/image-resize";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitch } from "@/components/language-switch";
@@ -39,8 +40,63 @@ export function MePanel({
   const [verifyBusy, setVerifyBusy] = useState(false);
   const [tips, setTips] = useState<string[] | null>(null);
   const [idBusy, setIdBusy] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
   const idInput = useRef<HTMLInputElement>(null);
   const selfieInput = useRef<HTMLInputElement>(null);
+  const photoInput = useRef<HTMLInputElement>(null);
+
+  const primaryUniverse = (me.universes ?? [])[0] ?? me.intention ?? "mariage";
+  const otherUniverses = (me.universes ?? []).slice(1);
+
+  const changePhoto = async (file: File | undefined) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    if (!me.birthDate) {
+      onEdit();
+      return;
+    }
+    setPhotoBusy(true);
+    try {
+      const photoUrl = await fileToResizedDataUrl(file);
+      const photoBlurUrl = await makeBlurDataUrl(photoUrl);
+      await upsertProfile({
+        data: {
+          firstName: me.firstName,
+          ageBand: me.ageBand,
+          birthDate: me.birthDate,
+          gender: me.gender,
+          lookingFor: me.lookingFor,
+          city: me.city,
+          country: me.country,
+          familyStatus: me.familyStatus,
+          intention: primaryUniverse,
+          universes: me.universes ?? [primaryUniverse],
+          universeData: me.universeData,
+          proDomain: me.proDomain,
+          bio: me.bio,
+          phone: me.phone,
+          photoUrl,
+          photoBlurUrl,
+          blurPhotos: me.blurPhotos,
+          heightCm: me.heightCm,
+          weightKg: me.weightKg,
+          profession: me.profession ?? "",
+          languages: me.languages ?? [],
+          loveLanguage: me.loveLanguage,
+          weekendStyle: me.weekendStyle,
+          emergencyName: me.emergencyName,
+          emergencyPhone: me.emergencyPhone,
+          referredBy: null,
+          charterAccepted: true,
+        },
+      });
+      onReload();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : t("authError"));
+    } finally {
+      setPhotoBusy(false);
+      if (photoInput.current) photoInput.current.value = "";
+    }
+  };
 
   return (
     <div className="page-panel page-panel-top">
@@ -52,14 +108,39 @@ export function MePanel({
         </div>
       </div>
       <div className="flex flex-col items-center text-center">
-        <ProfilePhoto
-          name={me.firstName}
-          seed={me.userId}
-          photoUrl={me.photoUrl}
-          className="size-28 rounded-full"
-          textClassName="text-4xl"
-        />
-        <h2 className="mt-4 font-display text-3xl font-medium">{me.firstName}</h2>
+        <div className="relative">
+          <ProfilePhoto
+            name={me.firstName}
+            seed={me.userId}
+            photoUrl={me.photoUrl}
+            className="size-28 rounded-full"
+            textClassName="text-4xl"
+          />
+          <input
+            ref={photoInput}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => void changePhoto(e.target.files?.[0])}
+          />
+          <button
+            type="button"
+            disabled={photoBusy}
+            onClick={() => photoInput.current?.click()}
+            className="absolute bottom-0 right-0 grid size-9 place-items-center rounded-full border border-border bg-card text-primary shadow-sm"
+            aria-label={t("photo")}
+          >
+            <Camera className="size-4" />
+          </button>
+        </div>
+        <h2 className="mt-4 flex items-center gap-2 font-display text-3xl font-medium">
+          {me.firstName}
+          {me.isPremium && (
+            <span className="inline-flex text-primary" title={t("prestige")} aria-label={t("prestige")}>
+              <Crown className="size-6" strokeWidth={1.8} />
+            </span>
+          )}
+        </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           {me.ageBand} · {me.city || countryName(lang, me.country)}
         </p>
@@ -74,17 +155,10 @@ export function MePanel({
               .join(" · ")}
           </p>
         )}
+
         <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-          {(me.universes ?? []).map((u, i) => (
-            <Badge key={u} tone={i === 0 ? "primary" : undefined}>
-              {t(u)}
-            </Badge>
-          ))}
-          <Badge>{t(me.familyStatus)}</Badge>
-          {me.isPremium && <Badge tone="ok">{t("prestige")}</Badge>}
-          {(staffRole === "admin" || staffRole === "moderator") && (
-            <Badge tone="primary">{staffRole === "admin" ? "Admin" : "Modérateur"}</Badge>
-          )}
+          <Badge tone="primary">{t(primaryUniverse)}</Badge>
+          {primaryUniverse === "mariage" && <Badge>{t(me.familyStatus)}</Badge>}
           {me.verificationStatus === "verifie" && (
             <Badge tone="ok">
               <ShieldCheck className="mr-1 size-3" />
@@ -98,13 +172,30 @@ export function MePanel({
               {t("idVerified")}
             </Badge>
           )}
-          {me.idDocumentStatus === "en_revue" && <Badge>{t("idInReview")}</Badge>}
         </div>
-        {(me.universes ?? []).map((u) => (
-          <div key={`facts-${u}`} className="mt-2 flex flex-col items-center">
-            <UniverseFacts universe={u} data={me.universeData} />
+
+        <div className="mt-3 w-full max-w-sm">
+          <UniverseFacts universe={primaryUniverse} data={me.universeData} />
+        </div>
+
+        {otherUniverses.length > 0 && (
+          <div className="mt-3 w-full max-w-sm space-y-2">
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {t("universeSubProfile")}
+            </p>
+            <div className="flex flex-wrap justify-center gap-1.5">
+              {otherUniverses.map((u) => (
+                <Badge key={u}>{t(u)}</Badge>
+              ))}
+            </div>
+            {otherUniverses.map((u) => (
+              <div key={`facts-${u}`} className="flex flex-col items-center">
+                <UniverseFacts universe={u} data={me.universeData} />
+              </div>
+            ))}
           </div>
-        ))}
+        )}
+
         {(me.languages ?? []).length > 0 && (
           <div className="mt-3 flex flex-wrap justify-center gap-1.5">
             {(me.languages ?? []).map((code) => (
