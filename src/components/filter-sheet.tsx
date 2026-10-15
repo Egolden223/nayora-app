@@ -243,14 +243,14 @@ export function FilterSheet({
             <details className="group rounded-2xl border border-border bg-secondary/40">
               <summary className="flex cursor-pointer list-none items-center justify-between px-3.5 py-2.5 text-sm min-h-[2.75rem]">
                 <span>
-                  {draft.countries.length === 0
+                  {(draft.countries ?? []).length === 0
                     ? t("allCountries")
-                    : `${draft.countries.length} ${t("countriesSelected")}`}
+                    : `${(draft.countries ?? []).length} ${t("countriesSelected")}`}
                 </span>
                 <span className="text-muted-foreground transition group-open:rotate-180">⌄</span>
               </summary>
               <div className="max-h-56 overflow-y-auto border-t border-border p-2">
-                {draft.countries.length > 0 && (
+                {(draft.countries ?? []).length > 0 && (
                   <button
                     type="button"
                     onClick={() => setDraft({ ...draft, countries: [] })}
@@ -266,13 +266,13 @@ export function FilterSheet({
                   >
                     <input
                       type="checkbox"
-                      checked={draft.countries.includes(c)}
+                      checked={(draft.countries ?? []).includes(c)}
                       onChange={(e) =>
                         setDraft({
                           ...draft,
                           countries: e.target.checked
-                            ? [...draft.countries, c]
-                            : draft.countries.filter((x) => x !== c),
+                            ? [...(draft.countries ?? []), c]
+                            : (draft.countries ?? []).filter((x) => x !== c),
                         })
                       }
                       className="accent-primary size-4"
