@@ -3,6 +3,9 @@ import type { Lang } from "@/lib/i18n";
 
 const EXTRA: Record<Lang, Record<string, string>> = {
   fr: {
+    staffPanel: "Panel de gestion",
+    priceAlsoIn: "Également affiché en USD et en euro.",
+    freeChatsNote: "15 conversations incluses au démarrage.",
     authPhone: "Téléphone",
     countryCode: "Indicatif",
     phonePlaceholder: "07 00 00 00 00",
@@ -24,6 +27,9 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     optional: "facultatif",
   },
   en: {
+    staffPanel: "Management panel",
+    priceAlsoIn: "Also shown in USD and euro.",
+    freeChatsNote: "15 conversations included at launch.",
     authPhone: "Phone",
     countryCode: "Country code",
     phonePlaceholder: "700000000",
@@ -45,6 +51,9 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     optional: "optional",
   },
   ar: {
+    staffPanel: "لوحة الإدارة",
+    priceAlsoIn: "يُعرض أيضًا بالدولار واليورو.",
+    freeChatsNote: "15 محادثة مشمولة عند الإطلاق.",
     authPhone: "الهاتف",
     countryCode: "رمز البلد",
     phonePlaceholder: "700000000",
@@ -66,6 +75,9 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     optional: "اختياري",
   },
   es: {
+    staffPanel: "Panel de gestión",
+    priceAlsoIn: "También se muestra en USD y en euros.",
+    freeChatsNote: "15 conversaciones incluidas al inicio.",
     authPhone: "Teléfono",
     countryCode: "Indicativo",
     phonePlaceholder: "600000000",
@@ -87,6 +99,9 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     optional: "opcional",
   },
   pt: {
+    staffPanel: "Painel de gestão",
+    priceAlsoIn: "Também mostrado em USD e em euros.",
+    freeChatsNote: "15 conversas incluídas no lançamento.",
     authPhone: "Telefone",
     countryCode: "Indicativo",
     phonePlaceholder: "900000000",
