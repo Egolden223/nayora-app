@@ -75,7 +75,7 @@ export function MePanel({
           </p>
         )}
         <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-          {me.universes.map((u, i) => (
+          {(me.universes ?? []).map((u, i) => (
             <Badge key={u} tone={i === 0 ? "primary" : undefined}>
               {t(u)}
             </Badge>
@@ -100,14 +100,14 @@ export function MePanel({
           )}
           {me.idDocumentStatus === "en_revue" && <Badge>{t("idInReview")}</Badge>}
         </div>
-        {me.universes.map((u) => (
+        {(me.universes ?? []).map((u) => (
           <div key={`facts-${u}`} className="mt-2 flex flex-col items-center">
             <UniverseFacts universe={u} data={me.universeData} />
           </div>
         ))}
-        {me.languages.length > 0 && (
+        {(me.languages ?? []).length > 0 && (
           <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-            {me.languages.map((code) => (
+            {(me.languages ?? []).map((code) => (
               <Badge key={code}>{languageName(lang, code)}</Badge>
             ))}
           </div>
@@ -148,7 +148,7 @@ export function MePanel({
             </Button>
           ) : (
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              {tips.map((tip) => (
+              {(tips ?? []).map((tip) => (
                 <li key={tip}>• {tip}</li>
               ))}
             </ul>
