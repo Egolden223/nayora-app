@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Compass, Crown, PartyPopper, Sparkles, UserRound } from "lucide-react";
 import type { DiscoverFilters } from "@/lib/dating";
 import type { DiscoverCard, MatchRow, Profile } from "@/lib/dating";
-import { getMyProfile, listDiscover, listMatches } from "@/lib/dating";
+import { listDiscover, listMatches, setActiveUniverse } from "@/lib/dating";
 import { useLang } from "@/lib/lang";
 import { Discover } from "@/components/discover";
 import { Inbox, PremiumPanel } from "@/components/inbox";
@@ -58,13 +58,28 @@ export function HomeShell({
     setMatches(Array.isArray(list) ? list : []);
   }, []);
 
+  // Univers actif = intention principale du profil (1er de universes)
   useEffect(() => {
     const universes = me.universes ?? [];
     const primary = universes[0] ?? me.intention ?? "mariage";
-    if (!universes.includes(filters.intention)) {
-      setFilters((f) => ({ ...f, intention: primary, facet: "all" }));
+    if (filters.intention !== primary) {
+      setFilters((f) => ({
+        ...f,
+        intention: primary,
+        facet: "all",
+        gender: "all",
+        ageBand: "all",
+        familyStatus: "all",
+      }));
     }
   }, [me.universes, me.intention]);
+
+  const activeUniverse = filters.intention;
+  const matchesInUniverse = matches.filter(
+    (m) =>
+      m.matchUniverse === activeUniverse ||
+      (m.partner.universes ?? []).includes(activeUniverse),
+  );
 
   useEffect(() => {
     let live = true;
@@ -119,18 +134,30 @@ export function HomeShell({
             me={me}
             cards={cards}
             filters={filters}
-            onFilters={setFilters}
+            onFilters={(next) => {
+              setFilters(next);
+              if (
+                next.intention &&
+                next.intention !== (me.universes?.[0] ?? me.intention)
+              ) {
+                void setActiveUniverse({ data: { universe: next.intention } }).then(
+                  () => onReloadMe(),
+                );
+              }
+            }}
             onRefresh={() => void refreshDiscover()}
             onMatched={(_p, matchId) => {
               void refreshMatches();
               void refreshDiscover();
               setSelectedMatch(matchId);
+              setTab("matches");
             }}
           />
         ) : tab === "matches" ? (
           <Inbox
             me={me}
-            matches={matches}
+            matches={matchesInUniverse}
+            activeUniverse={activeUniverse}
             selectedId={selectedMatch}
             onSelect={setSelectedMatch}
             onRefresh={() => void refreshMatches()}
@@ -236,6 +263,7 @@ function NavBtn({
 export function useProfileLoader() {
   const [me, setMe] = useState<Profile | null | undefined>(undefined);
   const reload = useCallback(async () => {
+    const { getMyProfile } = await import("@/lib/dating");
     const p = await getMyProfile();
     setMe(p);
   }, []);
