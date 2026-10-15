@@ -13,6 +13,7 @@ import {
   PENDING_PHONE_KEY,
   phoneToAuthEmail,
   toE164,
+  flagEmoji,
 } from "@/lib/phone-auth";
 import { cn } from "@/lib/utils";
 
@@ -116,7 +117,6 @@ function Login() {
         <p className="mb-6 text-sm text-muted-foreground">Sign-in is disabled.</p>
       )}
 
-      {/* Méthode : e-mail ou téléphone */}
       <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl bg-secondary/60 p-1">
         <button
           type="button"
@@ -176,14 +176,14 @@ function Login() {
             <div className="flex gap-2">
               <select
                 id="dial"
-                className="h-10 max-w-[12rem] shrink-0 rounded-md border border-input bg-background px-2 text-sm"
+                className="h-10 max-w-[9.5rem] shrink-0 rounded-md border border-input bg-background px-2 text-sm"
                 value={dial}
                 onChange={(e) => setDial(e.target.value)}
                 aria-label={t("countryCode")}
               >
                 {DIAL_CODES.map((c) => (
                   <option key={`${c.iso}-${c.dial}`} value={c.dial}>
-                    {c.dial} {c.label}
+                    {flagEmoji(c.iso)} {c.dial} {c.iso}
                   </option>
                 ))}
               </select>
