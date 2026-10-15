@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
-import {
-  authClient,
-  authEnabled,
-} from "@/lib/auth/client";
+import { authClient, authEnabled } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { useLang } from "@/lib/lang";
 import { Button } from "@/components/ui/button";
@@ -11,15 +8,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LanguageSwitch } from "@/components/language-switch";
 import { Wordmark } from "@/components/wordmark";
+import {
+  DIAL_CODES,
+  PENDING_PHONE_KEY,
+  phoneToAuthEmail,
+  toE164,
+} from "@/lib/phone-auth";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/login")({ component: Login });
+
+type Mode = "in" | "up";
+type Method = "email" | "phone";
 
 function Login() {
   const { user, isPending } = useCurrentUserState();
   const { t } = useLang();
-  const [mode, setMode] = useState<"in" | "up">("in");
+  const [mode, setMode] = useState<Mode>("in");
+  const [method, setMethod] = useState<Method>("email");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [dial, setDial] = useState("+225");
+  const [phoneNational, setPhoneNational] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -33,6 +43,16 @@ function Login() {
   }
   if (user) return <Navigate to="/" />;
 
+  const resolveAuthEmail = (): string | null => {
+    if (method === "email") {
+      const e = email.trim().toLowerCase();
+      return e.includes("@") ? e : null;
+    }
+    const e164 = toE164(dial, phoneNational);
+    if (!e164) return null;
+    return phoneToAuthEmail(e164);
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -40,18 +60,36 @@ function Login() {
       setError(t("minPassword"));
       return;
     }
+    const authEmail = resolveAuthEmail();
+    if (!authEmail) {
+      setError(method === "phone" ? t("invalidPhone") : t("authError"));
+      return;
+    }
     setBusy(true);
     try {
       if (mode === "up") {
+        const displayName =
+          name.trim() ||
+          (method === "phone" ? `${dial} ${phoneNational}`.trim() : email);
         const { error: err } = await authClient.signUp.email({
-          email,
+          email: authEmail,
           password,
-          name: name.trim() || email,
+          name: displayName,
         });
         if (err) throw new Error(err.message);
+        if (method === "phone") {
+          const e164 = toE164(dial, phoneNational);
+          if (e164) {
+            try {
+              sessionStorage.setItem(PENDING_PHONE_KEY, e164);
+            } catch {
+              /* ignore */
+            }
+          }
+        }
       } else {
         const { error: err } = await authClient.signIn.email({
-          email,
+          email: authEmail,
           password,
         });
         if (err) throw new Error(err.message);
@@ -66,18 +104,45 @@ function Login() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-12">
-      <div className="mb-10 flex items-start justify-between">
-        <div>
-          <Wordmark markClassName="text-4xl" />
-        </div>
+      <div className="mb-2 flex justify-end">
         <LanguageSwitch compact />
       </div>
 
+      <div className="mb-10 flex justify-center">
+        <Wordmark variant="auth" />
+      </div>
+
       {!authEnabled && (
-        <p className="mb-6 text-sm text-muted-foreground">
-          Sign-in is disabled.
-        </p>
+        <p className="mb-6 text-sm text-muted-foreground">Sign-in is disabled.</p>
       )}
+
+      {/* Méthode : e-mail ou téléphone */}
+      <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl bg-secondary/60 p-1">
+        <button
+          type="button"
+          className={cn(
+            "rounded-lg py-2 text-sm font-medium transition-colors",
+            method === "email"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+          onClick={() => setMethod("email")}
+        >
+          {t("email")}
+        </button>
+        <button
+          type="button"
+          className={cn(
+            "rounded-lg py-2 text-sm font-medium transition-colors",
+            method === "phone"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+          onClick={() => setMethod("phone")}
+        >
+          {t("authPhone")}
+        </button>
+      </div>
 
       <form className="space-y-3" onSubmit={submit}>
         {mode === "up" && (
@@ -91,17 +156,53 @@ function Login() {
             />
           </div>
         )}
-        <div className="space-y-1.5">
-          <Label htmlFor="email">{t("email")}</Label>
-          <Input
-            id="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-          />
-        </div>
+
+        {method === "email" ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="email">{t("email")}</Label>
+            <Input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              inputMode="email"
+            />
+          </div>
+        ) : (
+          <div className="space-y-1.5">
+            <Label htmlFor="phone">{t("authPhone")}</Label>
+            <div className="flex gap-2">
+              <select
+                id="dial"
+                className="h-10 w-[7.5rem] shrink-0 rounded-md border border-input bg-background px-2 text-sm"
+                value={dial}
+                onChange={(e) => setDial(e.target.value)}
+                aria-label={t("countryCode")}
+              >
+                {DIAL_CODES.map((c) => (
+                  <option key={`${c.iso}-${c.dial}`} value={c.dial}>
+                    {c.iso} {c.dial}
+                  </option>
+                ))}
+              </select>
+              <Input
+                id="phone"
+                type="tel"
+                required
+                value={phoneNational}
+                onChange={(e) => setPhoneNational(e.target.value)}
+                autoComplete="tel-national"
+                inputMode="numeric"
+                placeholder={t("phonePlaceholder")}
+                className="flex-1"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">{t("phoneAuthHint")}</p>
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <Label htmlFor="password">{t("password")}</Label>
           <Input
@@ -113,6 +214,7 @@ function Login() {
             autoComplete={mode === "up" ? "new-password" : "current-password"}
           />
         </div>
+
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button type="submit" className="w-full" disabled={busy}>
           {mode === "up" ? t("signUp") : t("signIn")}
