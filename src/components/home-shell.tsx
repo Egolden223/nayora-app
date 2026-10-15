@@ -17,7 +17,8 @@ import { cn } from "@/lib/utils";
 type Tab = "discover" | "matches" | "events" | "profile" | "premium";
 
 function defaultFilters(me: Profile): DiscoverFilters {
-  const primary = me.universes[0] ?? me.intention ?? "mariage";
+  const universes = me.universes ?? [];
+  const primary = universes[0] ?? me.intention ?? "mariage";
   return {
     ageBand: "all",
     gender: "all",
@@ -49,17 +50,18 @@ export function HomeShell({
 
   const refreshDiscover = useCallback(async () => {
     const list = await listDiscover({ data: filters });
-    setCards(list);
+    setCards(Array.isArray(list) ? list : []);
   }, [filters]);
 
   const refreshMatches = useCallback(async () => {
     const list = await listMatches();
-    setMatches(list);
+    setMatches(Array.isArray(list) ? list : []);
   }, []);
 
   useEffect(() => {
-    const primary = me.universes[0] ?? me.intention ?? "mariage";
-    if (!me.universes.includes(filters.intention)) {
+    const universes = me.universes ?? [];
+    const primary = universes[0] ?? me.intention ?? "mariage";
+    if (!universes.includes(filters.intention)) {
       setFilters((f) => ({ ...f, intention: primary, facet: "all" }));
     }
   }, [me.universes, me.intention]);
@@ -74,8 +76,8 @@ export function HomeShell({
           listMatches(),
         ]);
         if (!live) return;
-        setCards(d);
-        setMatches(m);
+        setCards(Array.isArray(d) ? d : []);
+        setMatches(Array.isArray(m) ? m : []);
       } finally {
         if (live) setLoading(false);
       }
