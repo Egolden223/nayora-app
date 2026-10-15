@@ -3,3 +3,4 @@ export * from "./dating_final";
 export { sendImageMessage } from "./dating_media";
 export { requestCall, getCallState } from "./dating_calls";
 export type { CallState } from "./dating_calls";
+export { setActiveUniverse } from "./universe-active";
