@@ -41,7 +41,7 @@ export function CirclesSection() {
       </h2>
       <p className="mt-1 text-xs text-muted-foreground">{t("circlesLead")}</p>
 
-      {data.circles.map((c) => (
+      {(data.circles ?? []).map((c) => (
         <div key={c.id} className="mt-3 rounded-2xl border border-border bg-background p-3 text-sm">
           <div className="flex items-start justify-between gap-2">
             <p className="font-medium">{c.title}</p>
@@ -62,7 +62,7 @@ export function CirclesSection() {
             )}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            {t("circlesMembers")} : {c.members.map((m) => `${m.firstName} (${m.ageBand})`).join(" · ")}
+            {t("circlesMembers")} : {(c.members ?? []).map((m) => `${m.firstName} (${m.ageBand})`).join(" · ")}
           </p>
           <Button size="sm" variant="ghost" className="mt-1" disabled={busy} onClick={() => run(() => leaveCircle({ data: { circleId: c.id } }))}>
             {t("circlesLeaveCircle")}
@@ -94,7 +94,7 @@ export function CirclesSection() {
         </div>
       )}
       {error && <p className="mt-2 text-xs text-destructive">{t("meetingError")}</p>}
-      {!data.circles.length && !data.waiting && <p className="mt-2 text-xs text-muted-foreground">{t("circlesNone")}</p>}
+      {!(data.circles ?? []).length && !data.waiting && <p className="mt-2 text-xs text-muted-foreground">{t("circlesNone")}</p>}
     </section>
   );
 }
