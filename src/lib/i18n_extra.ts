@@ -58,6 +58,7 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     activeUniverseHint: "Dans un univers actif, seules les cartes et conversations de cet univers s'affichent.",
     matchesInUniverse: "Conversations de cet univers",
     noMatchesInUniverse: "Aucune conversation dans cet univers pour l'instant.",
+    switchUniverseConfirm: "Basculer vers l'univers {universe} ? Les cartes et conversations afficheront uniquement cet univers.",
   },
   en: {
     subscribed: "Subscription Active",
@@ -115,6 +116,7 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     activeUniverseHint: "In an active universe, only cards and chats from that universe are shown.",
     matchesInUniverse: "Chats in this universe",
     noMatchesInUniverse: "No conversations in this universe yet.",
+    switchUniverseConfirm: "Switch to the {universe} universe? Cards and chats will show only this universe.",
   },
   ar: {
     subscribed: "الاشتراك نشط",
@@ -172,6 +174,7 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     activeUniverseHint: "في الكون النشط، تظهر فقط البطاقات والمحادثات الخاصة بهذا الكون.",
     matchesInUniverse: "محادثات هذا الكون",
     noMatchesInUniverse: "لا محادثات في هذا الكون بعد.",
+    switchUniverseConfirm: "Switch to {universe}? Cards and chats will show only this universe.",
   },
   es: {
     subscribed: "Suscripción activa",
@@ -229,6 +232,7 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     activeUniverseHint: "En un universo activo solo se muestran tarjetas y chats de ese universo.",
     matchesInUniverse: "Conversaciones de este universo",
     noMatchesInUniverse: "Aún no hay conversaciones en este universo.",
+    switchUniverseConfirm: "Cambiar al universo {universe}? Las tarjetas y chats mostraran solo este universo.",
   },
   pt: {
     subscribed: "Subscrição ativa",
@@ -286,6 +290,7 @@ const EXTRA: Record<Lang, Record<string, string>> = {
     activeUniverseHint: "Num universo ativo só se mostram cartões e chats desse universo.",
     matchesInUniverse: "Conversas deste universo",
     noMatchesInUniverse: "Ainda sem conversas neste universo.",
+    switchUniverseConfirm: "Mudar para o universo {universe}? Os cartoes e chats mostrarao apenas este universo.",
   },
 };
 
