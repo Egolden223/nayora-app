@@ -172,12 +172,12 @@ export function MePanel({
 
         <ActiveUniversePicker me={me} onReload={onReload} />
 
-        <div className="mt-3 w-full max-w-sm">
+        <div className="mt-3 w-full max-w-lg">
           <UniverseFacts universe={primaryUniverse} data={me.universeData} />
         </div>
 
         {otherUniverses.length > 0 && (
-          <div className="mt-3 w-full max-w-sm space-y-2">
+          <div className="mt-3 w-full max-w-lg space-y-2">
             <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               {t("universeSubProfile")}
             </p>
@@ -196,8 +196,8 @@ export function MePanel({
             ))}
           </div>
         )}
-        <p className="mt-4 max-w-sm text-sm leading-relaxed text-foreground/85">{me.bio}</p>
-        <div className="mt-6 flex w-full max-w-sm flex-col gap-2">
+        <p className="mt-4 w-full max-w-lg text-sm leading-relaxed text-foreground/85">{me.bio}</p>
+        <div className="mt-6 flex w-full max-w-lg flex-col gap-2">
           <Button onClick={onEdit}>{t("editProfile")}</Button>
           {(staffRole === "admin" || staffRole === "moderator") && (
             <Button
