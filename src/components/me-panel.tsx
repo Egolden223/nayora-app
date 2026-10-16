@@ -18,7 +18,6 @@ import { UserButton } from "@/lib/auth/gates";
 import { fileToResizedDataUrl, makeBlurDataUrl } from "@/lib/image-resize";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { LanguageSwitch } from "@/components/language-switch";
 import { ProfilePhoto } from "@/components/profile-photo";
 import { ActiveUniversePicker } from "@/components/active-universe-picker";
 
@@ -101,12 +100,9 @@ export function MePanel({
 
   return (
     <div className="page-panel page-panel-top">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-medium">{t("navProfile")}</h1>
-        <div className="flex items-center gap-2">
-          <LanguageSwitch compact />
-          <UserButton />
-        </div>
+        <UserButton />
       </div>
       <div className="flex flex-col items-center text-center">
         <div className="relative">
