@@ -182,13 +182,13 @@ export function HomeShell({
         )}
       </main>
 
-      <nav className="app-bottom-bar fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm">
+      <nav className="app-bottom-bar" aria-label="Navigation principale">
         <div className="app-bottom-nav grid grid-cols-5">
           <NavBtn
             active={tab === "discover"}
             label={t("navDiscover")}
             onClick={() => setTab("discover")}
-            icon={<Compass className="size-5" strokeWidth={1.6} />}
+            icon={<Compass className="size-5 shrink-0" strokeWidth={1.6} />}
           />
           <NavBtn
             active={tab === "matches"}
@@ -198,26 +198,26 @@ export function HomeShell({
               setTab("matches");
               void refreshMatches();
             }}
-            icon={<Sparkles className="size-5" strokeWidth={1.6} />}
+            icon={<Sparkles className="size-5 shrink-0" strokeWidth={1.6} />}
           />
           <NavBtn
             active={tab === "events"}
             label={t("navEvents")}
             onClick={() => setTab("events")}
-            icon={<PartyPopper className="size-5" strokeWidth={1.6} />}
+            icon={<PartyPopper className="size-5 shrink-0" strokeWidth={1.6} />}
           />
           <NavBtn
             active={tab === "premium"}
             label={t("navPremium")}
             onClick={() => setTab("premium")}
-            icon={<Crown className="size-5" strokeWidth={1.6} />}
+            icon={<Crown className="size-5 shrink-0" strokeWidth={1.6} />}
             accent
           />
           <NavBtn
             active={tab === "profile"}
             label={t("navProfile")}
             onClick={() => setTab("profile")}
-            icon={<UserRound className="size-5" strokeWidth={1.6} />}
+            icon={<UserRound className="size-5 shrink-0" strokeWidth={1.6} />}
           />
         </div>
       </nav>
@@ -243,7 +243,7 @@ function NavBtn({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex min-h-11 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium tracking-wide",
+        "flex min-h-11 min-w-0 flex-col items-center justify-center gap-0.5 px-0.5 py-2 text-[10px] font-medium tracking-wide",
         active
           ? accent
             ? "text-accent"
@@ -254,7 +254,7 @@ function NavBtn({
       )}
     >
       {icon}
-      {label}
+      <span className="max-w-full truncate">{label}</span>
     </button>
   );
 }
