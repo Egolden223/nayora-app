@@ -31,7 +31,7 @@ export function PremiumPanel({
 
   return (
     <div className="page-panel page-panel-top text-center">
-      <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary">Prestige</p>
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">Prestige</p>
       <h1 className="mt-2 font-display text-4xl font-medium">{t("premiumTitle")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">{t("premiumLead")}</p>
 
@@ -43,8 +43,7 @@ export function PremiumPanel({
           </div>
           <p className="mt-3 text-sm text-muted-foreground">{t("premiumActiveLead")}</p>
 
-          {/* Avantages débloqués — pas de tarif affiché */}
-          <ul className="mt-6 space-y-3 text-left text-sm">
+          <ul className="mt-6 space-y-3 text-left text-sm leading-relaxed">
             {benefits.map(({ icon: Icon, text }) => (
               <li
                 key={text}
@@ -58,9 +57,8 @@ export function PremiumPanel({
 
           <MatchmakerSection isPremium={me.isPremium} />
 
-          {/* Durée restante — sous Accompagnement personnalisé */}
           <div className="mt-8 rounded-2xl border border-border bg-card px-5 py-4 text-center">
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
               {t("premiumRemaining")}
             </p>
             <p className="mt-1 font-display text-3xl tabular-nums tracking-tight text-foreground">
@@ -72,7 +70,7 @@ export function PremiumPanel({
         </>
       ) : (
         <>
-          <ul className="mt-8 space-y-3 text-left text-sm">
+          <ul className="mt-8 space-y-3 text-left text-sm leading-relaxed">
             {benefits.map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-start gap-3 rounded-2xl border border-border bg-card px-4 py-3">
                 <Icon className="mt-0.5 size-4 shrink-0 text-primary" />
@@ -100,13 +98,13 @@ export function PremiumPanel({
                 )}
               </div>
             )}
-            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
               {t("transparentPricing")}
             </p>
           </div>
 
           <div className="mt-6 text-left">
-            <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <p className="mb-2 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
               {t("paymentMethod")}
             </p>
             <div className="grid grid-cols-2 gap-2">
