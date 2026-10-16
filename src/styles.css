@@ -35,6 +35,9 @@
   --radius-2xl: 36px;
 
   --shadow-soft: 0 18px 40px -24px rgb(4 7 20 / 0.7);
+
+  --shell-max: 28rem;
+  --shell-pad-x: 1rem;
 }
 
 @layer base {
@@ -55,9 +58,11 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    height: 100%;
   }
 
   body {
+    min-height: 100%;
     min-height: 100dvh;
     min-height: 100svh;
     background: var(--color-background);
@@ -66,8 +71,8 @@
     padding-top: env(safe-area-inset-top, 0px);
     padding-left: env(safe-area-inset-left, 0px);
     padding-right: env(safe-area-inset-right, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
     overflow-x: hidden;
+    overscroll-behavior-y: none;
   }
 
   img, video {
@@ -78,50 +83,118 @@
   input, select, textarea, button {
     font-size: 16px;
   }
+
+  @media (pointer: coarse) {
+    button,
+    [role="button"],
+    a.nav-item {
+      min-height: 44px;
+    }
+  }
 }
 
 @layer components {
   .app-shell {
     width: 100%;
-    max-width: 28rem;
+    max-width: var(--shell-max);
     margin-left: auto;
     margin-right: auto;
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-  }
-  @media (min-width: 640px) {
-    .app-shell { max-width: 32rem; }
-  }
-  @media (min-width: 1024px) {
-    .app-shell { max-width: 28rem; }
-  }
-  @media (min-width: 1280px) {
-    .app-shell { max-width: 30rem; }
-  }
-  @media (pointer: coarse) {
-    button, [role="button"] { touch-action: manipulation; }
+    padding-left: max(var(--shell-pad-x), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--shell-pad-x), env(safe-area-inset-right, 0px));
   }
 
   .app-main {
     width: 100%;
-    max-width: 28rem;
+    max-width: var(--shell-max);
     margin-left: auto;
     margin-right: auto;
-    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+    padding-left: max(var(--shell-pad-x), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--shell-pad-x), env(safe-area-inset-right, 0px));
+    padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+    flex: 1 1 auto;
   }
+
+  .app-bottom-nav {
+    width: 100%;
+    max-width: var(--shell-max);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .page-panel {
+    width: 100%;
+    max-width: var(--shell-max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: max(var(--shell-pad-x), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--shell-pad-x), env(safe-area-inset-right, 0px));
+    padding-bottom: 1rem;
+  }
+
+  .page-panel-top {
+    justify-content: flex-start;
+    min-height: auto;
+    padding-top: 0.25rem;
+  }
+
   @media (min-width: 640px) {
-    .app-main { max-width: 36rem; padding-top: 0.5rem; }
+    :root {
+      --shell-max: 32rem;
+      --shell-pad-x: 1.25rem;
+    }
+    .page-panel-top { padding-top: 0.75rem; }
   }
-  @media (min-width: 1024px) {
-    .app-main {
-      max-width: 42rem;
-      padding-top: 1rem;
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
+
+  @media (min-width: 768px) {
+    :root {
+      --shell-max: 36rem;
+      --shell-pad-x: 1.5rem;
+    }
+    .page-panel-top { padding-top: 1rem; }
+    .discover-empty {
+      justify-content: center;
+      min-height: min(52dvh, 420px);
+      padding: 2.5rem 2rem;
+      border-radius: 1.75rem;
+      border: 1px solid var(--color-border);
+      background: color-mix(in oklab, var(--color-card) 70%, transparent);
     }
   }
+
+  @media (min-width: 1024px) {
+    :root {
+      --shell-max: 28rem;
+      --shell-pad-x: 1.25rem;
+    }
+    .app-frame {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    :root {
+      --shell-max: 30rem;
+    }
+  }
+
   @media (min-width: 1440px) {
-    .app-main { max-width: 48rem; }
+    :root {
+      --shell-max: 32rem;
+    }
+  }
+
+  @media (max-height: 500px) and (orientation: landscape) {
+    .discover-card-frame {
+      max-height: min(70dvh, 320px);
+      aspect-ratio: auto;
+      height: min(70dvh, 320px);
+    }
+    .app-main {
+      padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+    }
   }
 
   .discover-empty {
@@ -133,16 +206,6 @@
     min-height: auto;
     padding: 1.5rem 1.25rem 2rem;
     text-align: center;
-  }
-  @media (min-width: 768px) {
-    .discover-empty {
-      justify-content: center;
-      min-height: min(52dvh, 420px);
-      padding: 2.5rem 2rem;
-      border-radius: 1.75rem;
-      border: 1px solid var(--color-border);
-      background: color-mix(in oklab, var(--color-card) 70%, transparent);
-    }
   }
 
   .discover-card-frame {
@@ -168,94 +231,6 @@
     .discover-card-frame {
       max-height: min(64dvh, 680px);
       max-width: 28rem;
-    }
-  }
-
-  .app-bottom-nav {
-    max-width: 36rem;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  @media (min-width: 1024px) {
-    .app-bottom-nav { max-width: 42rem; }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-@layer utilities {
-  .scrollbar-none {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-none::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-@media (max-width: 479px) {
-  .app-shell, .app-main {
-    max-width: 100%;
-  }
-}
-
-@media (pointer: coarse) {
-  button, [role="button"], a, summary {
-    min-height: 44px;
-  }
-  input, select, textarea {
-    min-height: 44px;
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgb(201 164 92 / 0.08), transparent),
-      var(--color-background);
-  }
-}
-
-/* ---- Lot 3 ergonomie globale ---- */
-@layer components {
-  .page-panel {
-    width: 100%;
-    max-width: 28rem;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 1rem 1.25rem calc(5.5rem + env(safe-area-inset-bottom, 0px));
-  }
-  @media (min-width: 640px) {
-    .page-panel {
-      max-width: 36rem;
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-      padding-top: 1.25rem;
-    }
-  }
-  @media (min-width: 1024px) {
-    .page-panel {
-      max-width: 42rem;
-      padding-top: 1.5rem;
-    }
-  }
-  @media (min-width: 1440px) {
-    .page-panel { max-width: 48rem; }
-  }
-
-  .page-panel-top {
-    justify-content: flex-start;
-    min-height: auto;
-  }
-  @media (min-width: 768px) {
-    .page-panel-top {
-      padding-top: 1.5rem;
     }
   }
 
@@ -291,5 +266,18 @@
     width: 100%;
     border: 0;
     background: #000;
+  }
+
+  @media (pointer: coarse) {
+    button, [role="button"] { touch-action: manipulation; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
