@@ -40,21 +40,21 @@ export function ActiveUniversePicker({
     <>
       <div className="mt-4 w-full max-w-sm space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
             {t("myUniverses")}
           </p>
           {canAdd && (
             <button
               type="button"
               onClick={() => setAddOpen(true)}
-              className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary"
+              className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
             >
               <Plus className="size-3" strokeWidth={2.2} />
               {t("addUniverse")}
             </button>
           )}
         </div>
-        <p className="text-[11px] leading-relaxed text-muted-foreground">
+        <p className="text-sm leading-relaxed text-muted-foreground">
           {t("activeUniverseHint")}
         </p>
         <div className="flex flex-wrap justify-center gap-2">
