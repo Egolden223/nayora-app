@@ -58,7 +58,6 @@ export function HomeShell({
     setMatches(Array.isArray(list) ? list : []);
   }, []);
 
-  // Univers actif = intention principale du profil (1er de universes)
   useEffect(() => {
     const universes = me.universes ?? [];
     const primary = universes[0] ?? me.intention ?? "mariage";
@@ -183,7 +182,7 @@ export function HomeShell({
         )}
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm">
+      <nav className="app-bottom-bar fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm">
         <div className="app-bottom-nav grid grid-cols-5">
           <NavBtn
             active={tab === "discover"}
