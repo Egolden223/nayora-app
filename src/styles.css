@@ -121,7 +121,6 @@
     margin-right: auto;
   }
 
-  /* Parent app-main gère largeur et padding horizontal */
   .page-panel {
     width: 100%;
     padding-bottom: 1rem;
@@ -157,28 +156,57 @@
     }
   }
 
+  /* Desktop / PC : colonne élargie + cadre centré (fini le grand vide) */
   @media (min-width: 1024px) {
     :root {
-      --shell-max: 28rem;
-      --shell-pad-x: 1.25rem;
+      --shell-max: 36rem;
+      --shell-pad-x: 1.5rem;
+    }
+    body {
+      background: #0a121e;
     }
     .app-frame {
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: stretch;
+      max-width: var(--shell-max);
+      margin-left: auto;
+      margin-right: auto;
+      background: var(--color-background);
+      box-shadow:
+        0 0 0 1px color-mix(in oklab, var(--color-border) 80%, transparent),
+        0 24px 80px -28px rgb(0 0 0 / 0.65);
+    }
+    .app-shell,
+    .app-main {
+      max-width: none;
+      width: 100%;
+    }
+    .app-bottom-nav {
+      max-width: none;
+      width: 100%;
+    }
+    .app-bottom-bar {
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: var(--shell-max);
+      border-left: 1px solid var(--color-border);
+      border-right: 1px solid var(--color-border);
     }
   }
 
   @media (min-width: 1280px) {
     :root {
-      --shell-max: 30rem;
+      --shell-max: 40rem;
     }
   }
 
   @media (min-width: 1440px) {
     :root {
-      --shell-max: 32rem;
+      --shell-max: 42rem;
     }
   }
 
