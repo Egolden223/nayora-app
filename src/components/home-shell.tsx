@@ -117,16 +117,16 @@ export function HomeShell({
   }
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <div className="mx-auto app-shell px-4 pt-4">
+    <div className="app-frame flex min-h-dvh flex-col">
+      <div className="app-shell pt-3">
         <InstallPrompt />
       </div>
-      <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 pb-1 pt-3 sm:px-6">
+      <header className="app-shell flex items-center justify-between pb-1 pt-2">
         <Wordmark compact markClassName="text-[1.7rem]" />
         <LanguageSwitch compact />
       </header>
 
-      <main className="flex-1 pb-20">
+      <main className="app-main flex-1">
         {loading && tab === "discover" ? (
           <div className="mx-auto mt-4 h-[42dvh] max-h-[380px] w-full max-w-md animate-pulse rounded-[28px] bg-card" />
         ) : tab === "discover" ? (
@@ -244,7 +244,7 @@ function NavBtn({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center gap-1 py-3 text-[10px] font-medium tracking-wide",
+        "flex min-h-11 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium tracking-wide",
         active
           ? accent
             ? "text-accent"
