@@ -141,7 +141,7 @@ function MatchList({
               {c.country ? `, ${c.country}` : ""}
             </p>
             {c.score > 0 && (
-              <p className="mt-1 text-xs text-primary">
+              <p className="mt-1 text-sm text-primary">
                 {t("compatScore")}: {c.score}% · {t(c.matchUniverse)}
               </p>
             )}
@@ -197,7 +197,7 @@ function MatchList({
                   className="size-16 rounded-full ring-2 ring-primary"
                   textClassName="text-lg"
                 />
-                <span className="max-w-16 truncate text-xs">{c.firstName}</span>
+                <span className="max-w-20 truncate text-sm">{c.firstName}</span>
               </button>
             ))}
           </div>
@@ -210,7 +210,7 @@ function MatchList({
             {activeUniverse ? t("noMatchesInUniverse") : t("noMatchesLead")}
           </p>
           {activeUniverse && (
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-sm text-muted-foreground">
               {t("activeUniverse")} : {t(activeUniverse)}
             </p>
           )}
@@ -235,7 +235,7 @@ function MatchList({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{m.partner.firstName}</p>
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="truncate text-sm text-muted-foreground">
                   {m.lastMessage || t(m.matchUniverse || m.partner.intention)}
                 </p>
               </div>
