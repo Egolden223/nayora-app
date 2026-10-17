@@ -32,7 +32,7 @@ export const requestCall = createServerFn({ method: "POST" })
     if (!m) throw new Error("no match");
     const sql = await getSql();
     const media = data.media === "audio" ? "audio" : "video";
-    const room = `nayora-${media}-${m.id}-${Math.random().toString(36).slice(2, 12)}`;
+    const room = `rayine-${media}-${m.id}-${Math.random().toString(36).slice(2, 12)}`;
     await sql.query(
       "insert into call_requests (match_id, requester_id, status, room) values ($1,$2,'pending',$3)",
       [m.id, context.userId, room],
