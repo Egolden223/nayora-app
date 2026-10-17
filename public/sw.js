@@ -1,10 +1,11 @@
-// NAYORA — service worker (v4).
+// RAYINE — service worker (v1).
 // Bump CACHE_NAME on every shell/auth fix so activate() drops stale caches.
-const CACHE_NAME = "nayora-shell-v4";
+const CACHE_NAME = "rayine-shell-v1";
 const PRECACHE_URLS = [
   "/manifest.webmanifest",
+  "/favicon.svg",
   "/favicon.png",
-  "/nayora-mark.png",
+  "/rayine-mark.svg",
   "/icon-192.png",
   "/icon-512.png",
 ];
@@ -29,7 +30,6 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Hashed /assets/* — cache after first successful network fetch.
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
@@ -42,7 +42,6 @@ async function staleWhileRevalidate(request) {
   return cached || network;
 }
 
-// HTML / navigations — always prefer network so deploys are visible immediately.
 async function networkFirstNavigation(request) {
   const cache = await caches.open(CACHE_NAME);
   try {
@@ -60,7 +59,6 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Never cache API / auth / server functions
   if (
     url.pathname.startsWith("/api/") ||
     url.pathname.startsWith("/_server") ||
