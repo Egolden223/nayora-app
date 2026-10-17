@@ -1,103 +1,57 @@
-import { useLang } from "@/lib/lang";
 import { cn } from "@/lib/utils";
 
 /**
  * RAYINE wordmark.
- * - compact (header app) : symbole + « RAYINE »
- * - default : symbole + RAYINE + slogan
- * - auth (login) : logo horizontal officiel + slogan
+ * - compact  → logo horizontal (en-tête de toutes les pages app)
+ * - default / hero → logo vertical (accueil splash, suspension)
+ * - auth → logo vertical (page connexion)
  */
 export function Wordmark({
   className,
-  markClassName,
+  markClassName: _markClassName,
   compact,
-  tagline = true,
+  tagline: _tagline = true,
   variant = "default",
 }: {
   className?: string;
   markClassName?: string;
   compact?: boolean;
   tagline?: boolean;
-  /** `auth` = logo officiel, réservé à /login */
+  /** `auth` = page login ; `default` = splash / hero */
   variant?: "default" | "auth";
 }) {
-  const { t } = useLang();
-
-  if (variant === "auth") {
+  // En-tête app : logo horizontal officiel
+  if (compact) {
     return (
       <span
-        className={cn("inline-flex flex-col items-center gap-3", className)}
+        className={cn("inline-flex items-center", className)}
         aria-label="RAYINE"
       >
         <img
           src="/rayine-logo-horizontal.svg"
-          alt=""
-          className="h-14 w-auto max-w-[min(100%,280px)] shrink-0 sm:h-16"
-          aria-hidden
+          alt="RAYINE — Connecter autrement."
+          className="h-8 w-auto max-w-[min(100%,220px)] shrink-0 object-contain object-left sm:h-9"
         />
-        {tagline && (
-          <span className="flex items-center gap-3 text-xs tracking-[0.12em] text-primary">
-            <span aria-hidden className="h-px w-8 bg-primary/70" />
-            {t("appTagline")}
-            <span aria-hidden className="h-px w-8 bg-primary/70" />
-          </span>
-        )}
       </span>
     );
   }
 
-  if (compact) {
-    return (
-      <span
-        className={cn("inline-flex items-center gap-2", className)}
-        aria-label="RAYINE"
-      >
-        <img
-          src="/rayine-mark.svg"
-          alt=""
-          className="h-8 w-8 shrink-0 object-contain"
-          aria-hidden
-        />
-        <span
-          className={cn(
-            "font-display text-xl font-medium uppercase tracking-[0.28em] text-foreground",
-            markClassName,
-          )}
-        >
-          Rayine
-        </span>
-      </span>
-    );
-  }
+  // Accueil / login / hero : logo vertical
+  const sizeClass =
+    variant === "auth"
+      ? "h-28 w-auto max-w-[min(100%,200px)] sm:h-32"
+      : "h-36 w-auto max-w-[min(100%,240px)] sm:h-44";
 
   return (
     <span
-      className={cn("inline-flex flex-col items-center gap-3", className)}
+      className={cn("inline-flex flex-col items-center", className)}
       aria-label="RAYINE"
     >
-      <span className="inline-flex items-center gap-2.5">
-        <img
-          src="/rayine-mark.svg"
-          alt=""
-          className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14"
-          aria-hidden
-        />
-        <span
-          className={cn(
-            "font-display text-4xl font-medium uppercase tracking-[0.28em] text-foreground sm:text-5xl",
-            markClassName,
-          )}
-        >
-          Rayine
-        </span>
-      </span>
-      {tagline && (
-        <span className="flex items-center gap-3 text-xs tracking-[0.12em] text-primary">
-          <span aria-hidden className="h-px w-8 bg-primary/70" />
-          {t("appTagline")}
-          <span aria-hidden className="h-px w-8 bg-primary/70" />
-        </span>
-      )}
+      <img
+        src="/rayine-logo-vertical.svg"
+        alt="RAYINE — Connecter autrement."
+        className={cn("shrink-0 object-contain", sizeClass)}
+      />
     </span>
   );
 }
