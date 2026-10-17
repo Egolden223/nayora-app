@@ -31,15 +31,28 @@ const LOCAL_DEV_ORIGINS: string[] = [
   "http://127.0.0.1:8080",
   "http://[::1]:8080",
 ];
+
+/** Production hosts for RAYINE (primary + legacy + custom domain). */
+const PRODUCTION_ORIGINS: string[] = [
+  "https://rayine.vercel.app",
+  "https://rayine.app",
+  "https://www.rayine.app",
+  "https://nayora-app.vercel.app",
+];
+
 const baseURL = explicitBaseURL ?? {
-  allowedHosts: ["localhost", "127.0.0.1", "[::1]"],
+  allowedHosts: ["localhost", "127.0.0.1", "[::1]", "rayine.vercel.app", "rayine.app", "www.rayine.app"],
   protocol: "auto" as const,
   fallback: "http://localhost:8080",
 };
 
-const trustedOrigins: string[] = explicitBaseURL
-  ? [explicitBaseURL, ...LOCAL_DEV_ORIGINS]
-  : LOCAL_DEV_ORIGINS;
+const trustedOrigins: string[] = Array.from(
+  new Set([
+    ...(explicitBaseURL ? [explicitBaseURL] : []),
+    ...PRODUCTION_ORIGINS,
+    ...LOCAL_DEV_ORIGINS,
+  ]),
+);
 
 const databaseUrl = env("DATABASE_URL");
 const database = databaseUrl
