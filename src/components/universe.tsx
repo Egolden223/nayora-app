@@ -15,7 +15,7 @@ export function UniverseBar({
 }: {
   value: string;
   onChange: (v: string) => void;
-  /** Univers activés sur le profil ; si omis, tous les univers NAYORA. */
+  /** Univers activés sur le profil ; si omis, tous les univers RAYINE. */
   allowed?: string[];
   className?: string;
 }) {
