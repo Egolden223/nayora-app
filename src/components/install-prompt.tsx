@@ -4,7 +4,7 @@ import { Download, Share, X } from "lucide-react";
 import { useLang } from "@/lib/lang";
 import { Button } from "@/components/ui/button";
 
-const DISMISSED_KEY = "nayora:install-dismissed";
+const DISMISSED_KEY = "rayine:install-dismissed";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -15,7 +15,6 @@ function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
   return (
     window.matchMedia?.("(display-mode: standalone)").matches ||
-    // iOS Safari's own (non-standard) flag.
     (navigator as unknown as { standalone?: boolean }).standalone === true
   );
 }
@@ -25,15 +24,7 @@ function isIos(): boolean {
   return /iphone|ipad|ipod/i.test(navigator.userAgent);
 }
 
-/**
- * Shows a small "Installer NAYORA" banner:
- *   - Android / desktop Chrome & Edge: captures `beforeinstallprompt` and
- *     triggers the browser's own native install dialog.
- *   - iOS Safari: no such event exists — shows the manual
- *     Share → "Sur l'écran d'accueil" instructions instead.
- * Hidden once already installed (standalone display mode), and after the
- * visitor dismisses it (remembered locally, not nagged again).
- */
+/** Banner installer PWA RAYINE (Android beforeinstallprompt / iOS Share). */
 export function InstallPrompt() {
   const { t } = useLang();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
@@ -66,8 +57,6 @@ export function InstallPrompt() {
   };
 
   if (dismissed) return null;
-  // Nothing actionable to show yet: not iOS, and Chrome hasn't fired
-  // beforeinstallprompt (already installed, criteria unmet, or still pending).
   if (!ios && !deferred) return null;
 
   return (
