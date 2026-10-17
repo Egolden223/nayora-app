@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LanguageSwitch } from "@/components/language-switch";
+import { ThemeSwitch } from "@/components/theme-switch";
 import { Wordmark } from "@/components/wordmark";
 import {
   DIAL_CODES,
@@ -105,8 +106,9 @@ function Login() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-12">
-      <div className="mb-2 flex justify-end">
+      <div className="mb-2 flex flex-col items-end gap-1.5">
         <LanguageSwitch compact />
+        <ThemeSwitch compact />
       </div>
 
       <div className="mb-10 flex justify-center">
