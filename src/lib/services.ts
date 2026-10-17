@@ -58,7 +58,7 @@ export const proposeMeeting = createServerFn({ method: "POST" })
       [m.id],
     );
     if (Number(open[0]?.c ?? 0) >= 3) throw new Error("too_many");
-    const room = `nayora-m${m.id}-${Math.random().toString(36).slice(2, 12)}`;
+    const room = `rayine-m${m.id}-${Math.random().toString(36).slice(2, 12)}`;
     await sql.query(
       "insert into meetings (match_id, proposer_id, kind, starts_at, duration_min, room) values ($1,$2,$3,$4,$5,$6)",
       [m.id, context.userId, data.kind, start.toISOString(), spec.minutes, room],
@@ -374,7 +374,7 @@ export const composeCirclesAdmin = createServerFn({ method: "POST" })
     );
     const reveal = new Date(start.getTime() - 12 * 3_600_000);
     for (const c of circles) {
-      const title = `Cercle NAYORA — ${c.city}${c.womenOnly ? " (femmes)" : ""}`;
+      const title = `Cercle RAYINE — ${c.city}${c.womenOnly ? " (femmes)" : ""}`;
       const created = await sql.query<{ id: number }>(
         `insert into circles (title, city, country, women_only, starts_at, reveal_at, created_by)
          values ($1,$2,$3,$4,$5,$6,$7) returning id`,

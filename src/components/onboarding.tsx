@@ -89,7 +89,7 @@ export function Onboarding({
   const [phone, setPhone] = useState(() => {
     if (initial?.phone) return initial.phone;
     try {
-      return sessionStorage.getItem("nayora_pending_phone") ?? "";
+      return sessionStorage.getItem("rayine_pending_phone") ?? "";
     } catch {
       return "";
     }
@@ -176,7 +176,7 @@ export function Onboarding({
         photoBlurUrl: blur,
         blurPhotos,
         referredBy:
-          typeof window !== "undefined" ? localStorage.getItem("nayora:ref") : null,
+          typeof window !== "undefined" ? localStorage.getItem("rayine:ref") ?? localStorage.getItem("nayora:ref") : null,
         charterAccepted: true,
       });
     } catch (err) {
@@ -404,7 +404,7 @@ export function Onboarding({
                   )}
                 >
                   <Icon className="size-5" strokeWidth={1.6} />
-                  <span className="text-sm font-medium">NAYORA {t(key)}</span>
+                  <span className="text-sm font-medium">RAYINE {t(key)}</span>
                   <span className="text-[11px] leading-snug opacity-80">{t(`uDesc_${key}`)}</span>
                   {active && universes[0] === key && (
                     <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">

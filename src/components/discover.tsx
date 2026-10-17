@@ -119,7 +119,7 @@ export function Discover({
       if (res.status === "matched") {
         if (likeNote.trim() && typeof sessionStorage !== "undefined") {
           sessionStorage.setItem(
-            `nayora:likeNote:${res.matchId}`,
+            `rayine:likeNote:${res.matchId}`,
             likeNote.trim().slice(0, 200),
           );
         }

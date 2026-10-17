@@ -47,7 +47,7 @@ export type Profile = {
   country: string;
   familyStatus: string;
   intention: string;
-  /** Tous les univers NAYORA du profil (le premier = principal = `intention`). */
+  /** Tous les univers RAYINE du profil (le premier = principal = `intention`). */
   universes: string[];
   /** Profil propre à chaque univers (objectif pro, intérêts, style de voyage, rôle projet…). */
   universeData: UniverseData;
@@ -1167,7 +1167,7 @@ export const requestCall = createServerFn({ method: "POST" })
     const m = await matchAccess(data.matchId, context.userId);
     if (!m) throw new Error("no match");
     const sql = await getSql();
-    const room = `nayora-${m.id}-${Math.random().toString(36).slice(2, 12)}`;
+    const room = `rayine-${m.id}-${Math.random().toString(36).slice(2, 12)}`;
     await sql.query(
       "insert into call_requests (match_id, requester_id, status, room) values ($1,$2,'pending',$3)",
       [m.id, context.userId, room],
@@ -1431,7 +1431,7 @@ export const suggestIcebreaker = createServerFn({ method: "POST" })
             {
               role: "system",
               content:
-                "You write one short, warm, non-flirty icebreaker for a serious dating/networking app named NAYORA. No emojis. No questions about appearance. One or two sentences max.",
+                "You write one short, warm, non-flirty icebreaker for a serious dating/networking app named RAYINE. No emojis. No questions about appearance. One or two sentences max.",
             },
             {
               role: "user",
@@ -1476,7 +1476,7 @@ export const explainMatch = createServerFn({ method: "POST" })
             {
               role: "system",
               content:
-                "Explain in 2 short sentences why two NAYORA profiles may get along. Calm, specific, no fluff, no emojis.",
+                "Explain in 2 short sentences why two RAYINE profiles may get along. Calm, specific, no fluff, no emojis.",
             },
             {
               role: "user",
@@ -1516,12 +1516,12 @@ function fallbackIce(me: Profile, them: Profile, lang: string): string {
     if (focus === "professionnel" || focus === "projets") {
       return `Hello ${them.firstName} — your ${them.proDomain ?? "work"} background caught my eye. What are you most excited to build right now?`;
     }
-    return `Hello ${them.firstName} — we both joined NAYORA ${name}. What does an ordinary good day look like in ${them.city}?`;
+    return `Hello ${them.firstName} — we both joined RAYINE ${name}. What does an ordinary good day look like in ${them.city}?`;
   }
   if (focus === "professionnel" || focus === "projets") {
     return `Bonjour ${them.firstName}, votre parcours côté ${them.proDomain ?? "pro"} m’a arrêté. Qu’est-ce qui vous anime le plus en ce moment ?`;
   }
-  return `Bonjour ${them.firstName}, nous sommes tous deux dans NAYORA ${name} — ça me parle. Qu’est-ce qui vous a donné envie d’écrire ici ?`;
+  return `Bonjour ${them.firstName}, nous sommes tous deux dans RAYINE ${name} — ça me parle. Qu’est-ce qui vous a donné envie d’écrire ici ?`;
 }
 
 function fallbackWhy(
@@ -1534,11 +1534,11 @@ function fallbackWhy(
   const names = shared.map((u) => UNIVERSE_NAMES[u] ?? u).join(" + ");
   if (lang === "en") {
     return shared.length
-      ? `You share the NAYORA ${names} universe and a ${score}% fit. That is a solid place to start a sincere conversation.`
+      ? `You share the RAYINE ${names} universe and a ${score}% fit. That is a solid place to start a sincere conversation.`
       : `Different paths, ${score}% fit — ${them.city} and a clear profile often matter more than identical checkboxes.`;
   }
   return shared.length
-    ? `Même univers NAYORA ${names} et ${score} % d’affinité. Un bon socle pour une conversation sincère.`
+    ? `Même univers RAYINE ${names} et ${score} % d’affinité. Un bon socle pour une conversation sincère.`
     : `Chemins différents, ${score} % d’affinité — ${them.city} et un profil clair comptent souvent plus que des cases identiques.`;
 }
 
@@ -1602,7 +1602,7 @@ export const getProfileCoachTips = createServerFn({ method: "POST" })
             {
               role: "system",
               content:
-                "You are a warm, direct dating-profile coach for the serious connection app NAYORA. Give at most 2 short, specific, actionable tips (no fluff, no emojis) to make this bio more attractive and trustworthy, in the requested language. One sentence each.",
+                "You are a warm, direct dating-profile coach for the serious connection app RAYINE. Give at most 2 short, specific, actionable tips (no fluff, no emojis) to make this bio more attractive and trustworthy, in the requested language. One sentence each.",
             },
             {
               role: "user",

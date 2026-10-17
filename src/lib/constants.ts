@@ -94,10 +94,10 @@ export const FAMILY_STATUSES = [
 export type FamilyStatus = (typeof FAMILY_STATUSES)[number];
 
 /**
- * Univers NAYORA. Les clés historiques (colonne `intention`) sont conservées
+ * Univers RAYINE. Les clés historiques (colonne `intention`) sont conservées
  * pour la compatibilité des données :
- *   mariage → NAYORA Love · amitie → NAYORA Friends · professionnel → NAYORA Pro
- *   voyage → NAYORA Travel & Adventure · projets → NAYORA Projects & Learn
+ *   mariage → RAYINE Love · amitie → RAYINE Friends · professionnel → RAYINE Pro
+ *   voyage → RAYINE Travel & Adventure · projets → RAYINE Projects & Learn
  */
 export const INTENTIONS = [
   "mariage",
@@ -282,7 +282,7 @@ export const DEMO_REPLIES: Record<string, string> = {
     "Hello. Je suis curieuse : quel est votre projet favori en ce moment ?",
   "demo-sofiane":
     "Content de faire votre connaissance. Vous faites du sport vous aussi ?",
-  "demo-ines": "Avec plaisir. Qu’est-ce qui vous amène sur NAYORA ?",
+  "demo-ines": "Avec plaisir. Qu’est-ce qui vous amène sur RAYINE ?",
   "demo-ibrahim":
     "Ravi. Parlons peu, parlons vrai — qu’est-ce que vous cherchez ici ?",
 };

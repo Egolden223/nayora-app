@@ -312,7 +312,7 @@ export const resolveReport = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
-/** "Cercles NAYORA" — rencontres de groupe. Création réservée aux modérateurs/admins. */
+/** "Cercles RAYINE" — rencontres de groupe. Création réservée aux modérateurs/admins. */
 /**
  * Palier "concierge" : un modérateur suggère manuellement un profil à un
  * utilisateur (recherché par prénom — v1 volontairement simple). Le

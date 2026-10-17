@@ -203,7 +203,7 @@ export const DIAL_CODES: DialCode[] = [
   { iso: "ZW", dial: "+263", label: "Zimbabwe" },
 ];
 
-export const PENDING_PHONE_KEY = "nayora_pending_phone";
+export const PENDING_PHONE_KEY = "rayine_pending_phone";
 
 export function toE164(dial: string, national: string): string | null {
   const d = (dial || "").trim();
@@ -215,5 +215,5 @@ export function toE164(dial: string, national: string): string | null {
 /** E-mail synthétique pour Better Auth (pas d'SMS). */
 export function phoneToAuthEmail(e164: string): string {
   const digits = e164.replace(/\D/g, "");
-  return `phone.${digits}@phone.nayora.app`;
+  return `phone.${digits}@phone.rayine.app`;
 }
