@@ -1,0 +1,14 @@
+RAYINE — fichiers à uploader dans le dépôt (nayora-app)
+
+1. Copier en gardant les chemins :
+   src/lib/i18n.ts          → dictionnaire complet 5 langues (NAYORA → RAYINE)
+   public/*                 → favicon, icônes PWA, OG, logos SVG
+
+2. Commandes :
+   cd nayora-app
+   cp -r /chemin/vers/cette_archive/* .
+   git add src/lib/i18n.ts public/
+   git commit -m "fix: restore i18n RAYINE + assets brand kit"
+   git push
+
+3. Vercel redéploiera automatiquement.
