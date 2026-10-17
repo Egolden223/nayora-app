@@ -46,7 +46,7 @@ const database = databaseUrl
   ? new Pool({ connectionString: databaseUrl })
   : { dialect: pgliteDialect(() => getPglite()), type: "postgres" as const };
 
-export const SESSION_TOKEN_COOKIE = "__Host-nayora-auth.session_token";
+export const SESSION_TOKEN_COOKIE = "__Host-rayine-auth.session_token";
 
 export const auth = betterAuth({
   baseURL,
@@ -60,9 +60,9 @@ export const auth = betterAuth({
     defaultCookieAttributes: { secure: true, sameSite: "lax", path: "/" },
     cookies: {
       session_token: { name: SESSION_TOKEN_COOKIE },
-      session_data: { name: "__Host-nayora-auth.session_data" },
-      account_data: { name: "__Host-nayora-auth.account_data" },
-      dont_remember: { name: "__Host-nayora-auth.dont_remember" },
+      session_data: { name: "__Host-rayine-auth.session_data" },
+      account_data: { name: "__Host-rayine-auth.account_data" },
+      dont_remember: { name: "__Host-rayine-auth.dont_remember" },
     },
   },
   plugins: [tanstackStartCookies()],
