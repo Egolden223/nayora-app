@@ -8,6 +8,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 import { AuthProvider } from "@/lib/auth/provider";
 import { LangProvider } from "@/lib/lang";
+import { ThemeProvider, useTheme } from "@/lib/theme";
 import { migrateLegacyStorage } from "@/lib/storage-migrate";
 import { useRegisterServiceWorker } from "@/lib/register-service-worker";
 import { Toaster } from "sonner";
@@ -85,29 +86,50 @@ function RootDocument() {
     if (ref) localStorage.setItem("rayine:ref", ref.toUpperCase());
   }, []);
   return (
-    <html lang="fr" className="dark antialiased" suppressHydrationWarning>
+    <html lang="fr" className="dark antialiased" suppressHydrationWarning data-theme="dark">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('rayine.theme');if(t!=='light'&&t!=='dark')t='dark';var r=document.documentElement;r.classList.remove('dark','light');r.classList.add(t);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='light'?'#F5F0E7':'#101C2C');}catch(e){}})();`,
+          }}
+        />
       </head>
       <body>
         <AuthProvider>
-          <LangProvider>
-            <Outlet />
-            <Toaster
-              theme="dark"
-              position="top-center"
-              toastOptions={{
-                style: {
-                  background: "#172740",
-                  color: "#f5f0e7",
-                  border: "1px solid #2a3f5e",
-                },
-              }}
-            />
-          </LangProvider>
+          <ThemeProvider>
+            <LangProvider>
+              <Outlet />
+              <ThemedToaster />
+            </LangProvider>
+          </ThemeProvider>
         </AuthProvider>
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function ThemedToaster() {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+  return (
+    <Toaster
+      theme={isLight ? "light" : "dark"}
+      position="top-center"
+      toastOptions={{
+        style: isLight
+          ? {
+              background: "#ffffff",
+              color: "#101c2c",
+              border: "1px solid #d4c9b4",
+            }
+          : {
+              background: "#172740",
+              color: "#f5f0e7",
+              border: "1px solid #2a3f5e",
+            },
+      }}
+    />
   );
 }
