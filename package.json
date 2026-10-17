@@ -1,8 +1,8 @@
 {
-  "name": "nayora",
+  "name": "rayine",
   "private": true,
   "version": "1.0.0",
-  "description": "NAYORA — Connecter autrement. Love, Friends, Pro, Travel, Projects.",
+  "description": "RAYINE — Connecter autrement. Love, Friends, Pro, Travel, Projects.",
   "sideEffects": false,
   "type": "module",
   "overrides": {
