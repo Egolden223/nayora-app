@@ -5,6 +5,7 @@ const LEGACY_KEYS: Record<string, string> = {
   "nayora:ref": "rayine:ref",
   "nayora:install-dismissed": "rayine:install-dismissed",
   "nayora.lang": "rayine.lang",
+  "nayora.theme": "rayine.theme",
   "nayora_pending_phone": "rayine_pending_phone",
 };
 

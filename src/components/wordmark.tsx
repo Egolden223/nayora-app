@@ -1,10 +1,11 @@
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/lib/theme";
 
 /**
  * RAYINE wordmark.
- * - compact  → logo horizontal (en-tête de toutes les pages app)
- * - default / hero → logo vertical (accueil splash, suspension)
- * - auth → logo vertical (page connexion)
+ * - compact  → logo horizontal (en-tête)
+ * - default / auth → logo vertical (accueil / login)
+ * Logos sur-fonce (thème sombre) ou sur-clair (thème clair).
  */
 export function Wordmark({
   className,
@@ -17,10 +18,17 @@ export function Wordmark({
   markClassName?: string;
   compact?: boolean;
   tagline?: boolean;
-  /** `auth` = page login ; `default` = splash / hero */
   variant?: "default" | "auth";
 }) {
-  // En-tête app : logo horizontal officiel (symbole + RAYINE + slogan)
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+  const horizontalSrc = isLight
+    ? "/rayine-logo-horizontal-light.svg"
+    : "/rayine-logo-horizontal.svg";
+  const verticalSrc = isLight
+    ? "/rayine-logo-vertical-light.svg"
+    : "/rayine-logo-vertical.svg";
+
   if (compact) {
     return (
       <span
@@ -28,7 +36,7 @@ export function Wordmark({
         aria-label="RAYINE"
       >
         <img
-          src="/rayine-logo-horizontal.svg"
+          src={horizontalSrc}
           alt="RAYINE — Connecter autrement."
           className="h-10 w-auto max-w-[min(100%,240px)] shrink-0 object-contain object-left sm:h-11"
         />
@@ -36,7 +44,6 @@ export function Wordmark({
     );
   }
 
-  // Accueil / login / hero : logo vertical
   const sizeClass =
     variant === "auth"
       ? "h-28 w-auto max-w-[min(100%,200px)] sm:h-32"
@@ -48,7 +55,7 @@ export function Wordmark({
       aria-label="RAYINE"
     >
       <img
-        src="/rayine-logo-vertical.svg"
+        src={verticalSrc}
         alt="RAYINE — Connecter autrement."
         className={cn("shrink-0 object-contain", sizeClass)}
       />
