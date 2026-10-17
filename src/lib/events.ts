@@ -12,7 +12,7 @@ export type EventRow = {
   capacity: number | null;
   attendeeCount: number;
   going: boolean;
-  /** Univers NAYORA de l'événement (mariage, amitie, professionnel, voyage, projets) — optionnel. */
+  /** Univers RAYINE de l'événement (mariage, amitie, professionnel, voyage, projets) — optionnel. */
   universe: string | null;
 };
 
