@@ -11,7 +11,7 @@ import { migrateLegacyStorage } from "@/lib/storage-migrate";
 import { isRtl, LANGS, t as tr, type Lang } from "@/lib/i18n";
 import { tExtra } from "@/lib/i18n_extra";
 
-const KEY = "nayora.lang";
+const KEY = "rayine.lang";
 
 const LangContext = createContext<{
   lang: Lang;
