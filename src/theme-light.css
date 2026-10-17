@@ -1,0 +1,39 @@
+/* RAYINE — thème clair (palette brand kit) */
+html.light {
+  color-scheme: light;
+  --color-background: #f5f0e7;
+  --color-foreground: #101c2c;
+  --color-card: #ffffff;
+  --color-card-foreground: #101c2c;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #101c2c;
+  --color-primary: #c9a45c;
+  --color-primary-foreground: #1a1405;
+  --color-secondary: #ebe3d4;
+  --color-secondary-foreground: #101c2c;
+  --color-muted: #e8e0d2;
+  --color-muted-foreground: #5a6578;
+  --color-accent: #d8c7a5;
+  --color-accent-foreground: #1a1405;
+  --color-destructive: #c1554b;
+  --color-destructive-foreground: #fff6f3;
+  --color-border: #d4c9b4;
+  --color-input: #d4c9b4;
+  --color-ring: #c9a45c;
+  --color-cream: #f5f0e7;
+  --color-plum: #e8e0d2;
+  --shadow-soft: 0 18px 40px -24px rgb(16 28 44 / 0.18);
+}
+html.dark {
+  color-scheme: dark;
+}
+@media (min-width: 1024px) {
+  html.light body {
+    background: #e8e0d2;
+  }
+  html.light .app-frame {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-border) 80%, transparent),
+      0 24px 80px -28px rgb(16 28 44 / 0.2);
+  }
+}

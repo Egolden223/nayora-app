@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./theme-light.css";
 
 @theme {
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
@@ -156,7 +157,6 @@
     }
   }
 
-  /* Barre nav : mobile plein écran */
   .app-bottom-bar {
     position: fixed;
     left: 0;
@@ -171,14 +171,13 @@
     -webkit-backdrop-filter: blur(8px);
   }
 
-  /* Desktop / PC : colonne élargie + cadre + nav alignée */
   @media (min-width: 1024px) {
     :root {
       --shell-max: 36rem;
       --shell-pad-x: 1.5rem;
     }
     body {
-      background: #0a121e;
+      background: var(--color-plum);
     }
     .app-frame {
       position: relative;
@@ -204,7 +203,6 @@
       max-width: none;
       width: 100%;
     }
-    /* Nav calée exactement sur le cadre (sans transform) */
     .app-bottom-bar {
       left: max(0px, calc((100vw - min(100vw, var(--shell-max))) / 2));
       right: auto;
