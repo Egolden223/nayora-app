@@ -1,6 +1,6 @@
-// RAYINE — service worker (v1).
+// RAYINE — service worker (v2).
 // Bump CACHE_NAME on every shell/auth fix so activate() drops stale caches.
-const CACHE_NAME = "rayine-shell-v1";
+const CACHE_NAME = "rayine-shell-v2";
 const PRECACHE_URLS = [
   "/manifest.webmanifest",
   "/favicon.svg",
