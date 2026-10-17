@@ -13,7 +13,7 @@ import { useRegisterServiceWorker } from "@/lib/register-service-worker";
 import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "NAYORA";
+const APP_NAME = "RAYINE";
 
 const fetchSessionUser = createServerFn({ method: "GET" }).handler(async () => {
   const { getSessionUser } = await import("@/lib/auth/verify.server");
@@ -35,9 +35,9 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "NAYORA — Connecter autrement. Rencontres sincères, amitiés, réseau professionnel, voyages et projets. Ouverte à tous les pays du monde.",
+          "RAYINE — Connecter autrement. Rencontres sincères, amitiés, réseau professionnel, voyages et projets. Ouverte à tous les pays du monde.",
       },
-      { property: "og:title", content: "NAYORA — Connecter autrement." },
+      { property: "og:title", content: "RAYINE — Connecter autrement." },
       {
         property: "og:description",
         content:
@@ -54,6 +54,7 @@ export const Route = createRootRoute({
       { name: "format-detection", content: "telephone=no" },
     ],
     links: [
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
@@ -81,7 +82,7 @@ function RootDocument() {
   useEffect(() => {
     migrateLegacyStorage();
     const ref = new URLSearchParams(window.location.search).get("ref");
-    if (ref) localStorage.setItem("nayora:ref", ref.toUpperCase());
+    if (ref) localStorage.setItem("rayine:ref", ref.toUpperCase());
   }, []);
   return (
     <html lang="fr" className="dark antialiased" suppressHydrationWarning>
