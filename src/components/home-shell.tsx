@@ -11,6 +11,7 @@ import { EventsPanel } from "@/components/events-panel";
 import { Onboarding } from "@/components/onboarding";
 import { Wordmark } from "@/components/wordmark";
 import { LanguageSwitch } from "@/components/language-switch";
+import { ThemeSwitch } from "@/components/theme-switch";
 import { InstallPrompt } from "@/components/install-prompt";
 import { cn } from "@/lib/utils";
 
@@ -120,9 +121,12 @@ export function HomeShell({
       <div className="app-shell pt-3">
         <InstallPrompt />
       </div>
-      <header className="app-shell flex items-center justify-between pb-1 pt-2">
+      <header className="app-shell flex items-center justify-between gap-2 pb-1 pt-2">
         <Wordmark compact markClassName="text-[1.7rem]" />
-        <LanguageSwitch compact />
+        <div className="flex flex-col items-end gap-1.5">
+          <LanguageSwitch compact />
+          <ThemeSwitch compact />
+        </div>
       </header>
 
       <main className="app-main flex-1">
