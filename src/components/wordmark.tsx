@@ -20,7 +20,7 @@ export function Wordmark({
   /** `auth` = page login ; `default` = splash / hero */
   variant?: "default" | "auth";
 }) {
-  // En-tête app : logo horizontal officiel
+  // En-tête app : logo horizontal officiel (symbole + RAYINE + slogan)
   if (compact) {
     return (
       <span
@@ -30,7 +30,7 @@ export function Wordmark({
         <img
           src="/rayine-logo-horizontal.svg"
           alt="RAYINE — Connecter autrement."
-          className="h-8 w-auto max-w-[min(100%,220px)] shrink-0 object-contain object-left sm:h-9"
+          className="h-10 w-auto max-w-[min(100%,240px)] shrink-0 object-contain object-left sm:h-11"
         />
       </span>
     );
