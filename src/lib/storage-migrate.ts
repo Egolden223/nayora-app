@@ -1,7 +1,10 @@
 const LEGACY_KEYS: Record<string, string> = {
-  "as:ref": "nayora:ref",
-  "as:install-dismissed": "nayora:install-dismissed",
-  "aura.lang": "nayora.lang",
+  "as:ref": "rayine:ref",
+  "as:install-dismissed": "rayine:install-dismissed",
+  "aura.lang": "rayine.lang",
+  "nayora:ref": "rayine:ref",
+  "nayora:install-dismissed": "rayine:install-dismissed",
+  "nayora.lang": "rayine.lang",
 };
 
 export function migrateLegacyStorage(): void {
